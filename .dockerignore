@@ -1,0 +1,27 @@
+# Dependencies
+node_modules
+__pycache__
+*.pyc
+.git
+.github
+*.md
+.env
+.env.*
+.env.local
+.gitignore
+Dockerfile*
+docker-compose*
+.git
+.venv
+venv
+*.log
+*.tmp
+temp
+logs
+data
+*.sqlite
+*.db
+.vscode
+.idea
+dist
+.cache

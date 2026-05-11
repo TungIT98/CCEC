@@ -1,0 +1,33 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@10.25.0 --activate
+
+# Copy just the web app files
+COPY apps/web/package.json apps/web/
+
+# Install dependencies AND explicit tailwind packages
+RUN cd apps/web && npm install && npm install @tailwindcss/postcss @tailwindcss/vite tailwindcss
+
+# Copy source
+COPY apps/web/src apps/web/src
+COPY apps/web/public apps/web/public
+COPY apps/web/astro.config.mjs apps/web/
+COPY apps/web/svelte.config.js apps/web/
+COPY apps/web/tsconfig.json apps/web/
+COPY apps/web/postcss.config.mjs apps/web/
+COPY apps/web/package.json apps/web/
+
+# Build
+WORKDIR /app/apps/web
+RUN npm run build
+
+# Runtime stage
+FROM node:20-alpine
+WORKDIR /app
+
+COPY --from=0 /app/apps/web/dist ./dist
+EXPOSE 4321
+CMD ["npx", "serve", "dist", "-l", "4321"]

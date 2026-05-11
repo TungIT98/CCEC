@@ -1,0 +1,21 @@
+{
+  "name": "@ccec/climate-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.25.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "dev:api": "pnpm --filter @ccec/api dev",
+    "dev:web": "pnpm --filter @ccec/web dev",
+    "build:api": "pnpm --filter @ccec/api build",
+    "build:web": "pnpm --filter @ccec/web build"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0"
+  }
+}

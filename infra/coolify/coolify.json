@@ -1,0 +1,105 @@
+{
+  "$schema": "https://raw.githubusercontent.com/coollabsio/coolify/main/schema.json",
+  "name": "CCEC Climate Platform",
+  "version": "1.0.0",
+  "services": {
+    "postgres": {
+      "version": "16-alpine",
+      "image": "postgres:16-alpine",
+      "publish": [
+        {
+          "host": "5432",
+          "target": 5432,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": {
+        "POSTGRES_USER": "ccec",
+        "POSTGRES_PASSWORD": "{{ {POSTGRES_PASSWORD} }}",
+        "POSTGRES_DB": "ccec_climate"
+      },
+      "volumes": [
+        {
+          "source": "postgres_data",
+          "target": "/var/lib/postgresql/data"
+        }
+      ],
+      "healthCheck": {
+        "command": "pg_isready -U ccec -d ccec_climate",
+        "interval": 10,
+        "timeout": 5,
+        "retries": 5
+      }
+    },
+    "redis": {
+      "version": "7.2-alpine",
+      "image": "redis:7.2-alpine",
+      "publish": [
+        {
+          "host": "6379",
+          "target": 6379,
+          "protocol": "tcp"
+        }
+      ],
+      "command": ["redis-server", "--appendonly", "yes"],
+      "volumes": [
+        {
+          "source": "redis_data",
+          "target": "/data"
+        }
+      ],
+      "healthCheck": {
+        "command": "redis-cli ping",
+        "interval": 10,
+        "timeout": 5,
+        "retries": 5
+      }
+    },
+    "api": {
+      "git": {
+        "url": "{{ {GIT_URL} }}",
+        "branch": "{{ {GIT_BRANCH:-main} }}",
+        "commit_message": "{{ {COMMIT_MESSAGE} }}"
+      },
+      "build": {
+        "dockerfile": "infra/docker/Dockerfile.api",
+        "context": "./"
+      },
+      "port": 8000,
+      "environment": {
+        "DATABASE_URL": "postgresql+asyncpg://ccec:{{ {POSTGRES_PASSWORD} }}@postgres:5432/ccec_climate",
+        "REDIS_URL": "redis://redis:6379/0",
+        "OPENAI_API_KEY": "{{ {OPENAI_API_KEY} }}",
+        "OPENAI_BASE_URL": "{{ {OPENAI_BASE_URL:-https://api.groq.com/v1} }}",
+        "OPENAI_MODEL": "{{ {OPENAI_MODEL:-llama-3.3-70b-versatile} }}"
+      },
+      "healthCheck": {
+        "path": "/health",
+        "port": 8000
+      },
+      "depends_on": ["postgres", "redis"]
+    },
+    "web": {
+      "git": {
+        "url": "{{ {GIT_URL} }}",
+        "branch": "{{ {GIT_BRANCH:-main} }}",
+        "commit_message": "{{ {COMMIT_MESSAGE} }}"
+      },
+      "build": {
+        "dockerfile": "infra/docker/Dockerfile.web",
+        "context": "./"
+      },
+      "port": 80,
+      "http": [
+        {
+          "domain": "{{ {DOMAIN} }}",
+          "path": "/"
+        }
+      ],
+      "nginx": {
+        "force_https": true
+      },
+      "depends_on": ["api"]
+    }
+  }
+}

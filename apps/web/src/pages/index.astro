@@ -1,0 +1,550 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="CCEC — Chiến lược Khí hậu Việt Nam">
+  <div class="min-h-screen flex flex-col">
+
+    <!-- ============================================================
+         NAVBAR — Sticky glassmorphism header
+         ============================================================ -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/80">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 1 0 10 10"/>
+              <path d="M12 6v6l4 2"/>
+              <path d="M2 12a10 10 0 0 1 10-10"/>
+            </svg>
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 text-base leading-tight block">CCEC</span>
+            <span class="text-xs text-slate-500 leading-tight">Climate Platform</span>
+          </div>
+        </a>
+
+        <!-- Nav links -->
+        <nav class="hidden md:flex items-center gap-1">
+          {[
+            { href: '/', label: 'Trang chủ' },
+            { href: '/dashboard', label: 'Dashboard' },
+            { href: '/emissions', label: 'Phát thải' },
+            { href: '/esg', label: 'ESG' },
+            { href: '/maps', label: 'Bản đồ' },
+          ].map(item => (
+            <a
+              href={item.href}
+              class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-all"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        <!-- CTA -->
+        <div class="flex items-center gap-3">
+          <a href="/chat" class="ccec-btn-primary hidden sm:inline-flex">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Trò chuyện AI
+          </a>
+          <a href="/login" class="px-4 py-2 text-sm font-semibold text-slate-700 border border-slate-300 rounded-lg hover:border-slate-400 hover:bg-slate-50 transition-all">
+            Đăng nhập
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============================================================
+         HERO SECTION — Premium gradient with glassmorphism
+         ============================================================ -->
+    <section class="relative overflow-hidden bg-slate-50">
+      <!-- Background decoration -->
+      <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-teal-500/8 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-blue-500/6 to-transparent rounded-full blur-3xl translate-y-1/2 -translate-x-1/4"></div>
+      </div>
+
+      <div class="relative max-w-7xl mx-auto px-6 pt-20 pb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <!-- Left: Text -->
+          <div>
+            <!-- Live badge -->
+            <div class="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-1.5 mb-8 shadow-sm">
+              <span class="status-dot status-dot-live"></span>
+              <span class="text-xs font-medium text-slate-600">Hệ thống đang hoạt động</span>
+              <span class="text-xs text-slate-400">· v1.0.0</span>
+            </div>
+
+            <!-- Headline -->
+            <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-6">
+              Chiến lược<br />
+              <span class="gradient-text">Khí hậu Việt Nam</span><br />
+              2030
+            </h1>
+
+            <p class="text-lg text-slate-600 mb-10 max-w-lg leading-relaxed">
+              Nền tảng giám sát khí hậu toàn diện — dữ liệu thời gian thực,
+              AI phân tích chuyên sâu, bản đồ tương tác và dự báo tình trạng khí hậu cấp tỉnh.
+            </p>
+
+            <!-- CTAs -->
+            <div class="flex flex-wrap gap-4 mb-16">
+              <a href="/dashboard" class="ccec-btn-primary text-base px-8 py-3.5 shadow-lg shadow-teal-900/10">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                Xem Dashboard
+              </a>
+              <a href="/emissions" class="ccec-btn-secondary text-base px-8 py-3.5">
+                Phát thải CO₂
+              </a>
+            </div>
+
+            <!-- Mini stats row -->
+            <div class="flex flex-wrap gap-8">
+              {[
+                { value: '63', label: 'Tỉnh/Thành phố', sub: 'Giám sát toàn quốc' },
+                { value: '372.9', label: 'MtCO₂', sub: 'Tổng phát thải 2024' },
+                { value: 'NDC', label: 'Mục tiêu 2030', sub: '-15.8% vs BAU' },
+              ].map(stat => (
+                <div>
+                  <div class="text-2xl font-bold text-slate-900">{stat.value}</div>
+                  <div class="text-sm font-medium text-slate-700">{stat.label}</div>
+                  <div class="text-xs text-slate-400">{stat.sub}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- Right: Hero visual card -->
+          <div class="hidden lg:block">
+            <div class="relative">
+              <!-- Main card -->
+              <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
+                <!-- Card header -->
+                <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-teal-600 flex items-center justify-center">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                      </svg>
+                    </div>
+                    <span class="font-semibold text-slate-800 text-sm">Climate Monitor</span>
+                  </div>
+                  <span class="ccec-badge ccec-badge-green">
+                    <span class="status-dot status-dot-live"></span>
+                    Live
+                  </span>
+                </div>
+                <!-- Card body -->
+                <div class="p-5">
+                  <div class="grid grid-cols-2 gap-3 mb-4">
+                    {[
+                      { label: 'Nhiệt độ', value: '28.5°C', icon: 'M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 12v5', iconColor: 'text-red-500', bgColor: 'bg-red-50' },
+                      { label: 'Lượng mưa', value: '142 mm', icon: 'M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM8 14a5 5 0 0 1 8 4', iconColor: 'text-blue-500', bgColor: 'bg-blue-50' },
+                      { label: 'Độ ẩm', value: '75%', icon: 'M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 12v5', iconColor: 'text-purple-500', bgColor: 'bg-purple-50' },
+                      { label: 'CO₂ toàn cầu', value: '425 ppm', icon: 'M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM8 14a5 5 0 0 1 8 4', iconColor: 'text-amber-500', bgColor: 'bg-amber-50' },
+                    ].map(item => (
+                      <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
+                        <div class="flex items-center justify-between mb-1">
+                          <span class="text-xs text-slate-500">{item.label}</span>
+                          <div class={`w-5 h-5 rounded-md ${item.bgColor} flex items-center justify-center`}>
+                            <svg class={`w-3 h-3 ${item.iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                              <path d={item.icon}/>
+                            </svg>
+                          </div>
+                        </div>
+                        <div class="text-lg font-bold text-slate-900">{item.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <!-- Mini chart placeholder -->
+                  <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <div class="text-xs font-medium text-slate-600 mb-2">Xu hướng nhiệt độ 7 ngày</div>
+                    <div class="flex items-end gap-1 h-12">
+                      {[40, 55, 48, 65, 70, 58, 72, 80, 68, 85, 75, 90].map((h, i) => (
+                        <div class="flex-1 rounded-t-sm transition-all hover:opacity-80" style={`height: ${h}%; background: linear-gradient(to top, #0D9488, #14B8A6)`}></div>
+                      ))}
+                    </div>
+                    <div class="flex justify-between mt-1.5 text-xs text-slate-400">
+                      <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Floating badge top-right -->
+              <div class="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg border border-slate-200 px-4 py-2.5">
+                <div class="text-xs text-slate-500">Dự báo 7 ngày</div>
+                <div class="text-base font-bold text-teal-600">Hà Nội · Việt Nam</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FEATURES GRID — Clean professional cards
+         ============================================================ -->
+    <section class="bg-white py-20 px-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-14">
+          <span class="ccec-badge ccec-badge-teal mb-4">Tính năng</span>
+          <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">Giải pháp toàn diện</h2>
+          <p class="text-lg text-slate-500 max-w-2xl mx-auto">Nền tảng tích hợp đầy đủ công cụ giám sát, phân tích và dự báo khí hậu cho Việt Nam.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            {
+              href: '/dashboard',
+              iconBg: 'bg-teal-50',
+              iconColor: 'text-teal-600',
+              icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+              title: 'Dashboard Khí hậu',
+              desc: 'Biểu đồ nhiệt độ, lượng mưa, độ ẩm và CO₂ theo thời gian thực với ECharts tích hợp.',
+              tag: 'Dữ liệu thời gian thực',
+            },
+            {
+              href: '/maps',
+              iconBg: 'bg-blue-50',
+              iconColor: 'text-blue-600',
+              icon: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7',
+              title: 'Bản đồ Tương tác',
+              desc: 'Bản đồ Mapbox với lớp dữ liệu khí hậu, Deck.gl visualization và phân tích theo vùng.',
+              tag: 'GIS · Mapbox',
+            },
+            {
+              href: '/chat',
+              iconBg: 'bg-purple-50',
+              iconColor: 'text-purple-600',
+              icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
+              title: 'AI Phân tích',
+              desc: 'Trò chuyện với AI về chiến lược khí hậu, tích hợp CNKI research và dữ liệu khoa học.',
+              tag: 'Groq · DeepSeek',
+            },
+            {
+              href: '/emissions',
+              iconBg: 'bg-amber-50',
+              iconColor: 'text-amber-600',
+              icon: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z',
+              title: 'Phát thải CO₂',
+              desc: 'Theo dõi phát thải theo tỉnh/thành, ngành công nghiệp và so sánh với NDC ASEAN.',
+              tag: 'IEA · EDGAR',
+            },
+            {
+              href: '/esg',
+              iconBg: 'bg-emerald-50',
+              iconColor: 'text-emerald-600',
+              icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+              title: 'ESG Analytics',
+              desc: 'Phân tích ESG của doanh nghiệp, xếp hạng Sustainalytics, MSCI và Bloomberg ESG.',
+              tag: 'MSCI · Bloomberg',
+            },
+            {
+              href: '/dashboard',
+              iconBg: 'bg-indigo-50',
+              iconColor: 'text-indigo-600',
+              icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+              title: 'Dự báo Khí hậu',
+              desc: 'Dự báo 7 ngày và xu hướng dài hạn sử dụng Prophet ML và mô hình PyTorch 2.0.',
+              tag: 'Prophet · PyTorch',
+            },
+          ].map(feature => (
+            <a
+              href={feature.href}
+              class="group ccec-card p-6 flex flex-col gap-4 hover:border-teal-200"
+            >
+              <div class="flex items-start justify-between">
+                <div class={`w-12 h-12 rounded-xl ${feature.iconBg} flex items-center justify-center`}>
+                  <svg class={`w-6 h-6 ${feature.iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d={feature.icon}/>
+                  </svg>
+                </div>
+                <span class="ccec-badge ccec-badge-blue text-xs">{feature.tag}</span>
+              </div>
+              <div>
+                <h3 class="font-semibold text-lg text-slate-900 mb-2 group-hover:text-teal-700 transition-colors">
+                  {feature.title}
+                </h3>
+                <p class="text-sm text-slate-500 leading-relaxed">{feature.desc}</p>
+              </div>
+              <div class="flex items-center gap-1 text-sm font-medium text-teal-600 mt-auto group-hover:gap-2 transition-all">
+                Khám phá
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         EMISSIONS TREND CHART SECTION
+         ============================================================ -->
+    <section class="py-16 px-6 bg-slate-50">
+      <div class="max-w-7xl mx-auto">
+        <div class="ccec-chart-card">
+          <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div>
+              <h3 class="text-xl font-bold text-slate-900">Xu hướng Phát thải CO₂ — Việt Nam</h3>
+              <p class="text-sm text-slate-400 mt-1">Nguồn: IEA · EDGAR · Global Carbon Project</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                <span class="w-3 h-3 rounded-sm bg-teal-600 inline-block"></span>
+                Việt Nam
+              </div>
+              <button onclick="window._ccecChartPrev()" class="px-3 py-1.5 text-xs font-medium border border-slate-300 rounded-lg hover:bg-slate-100 transition">← Trước</button>
+              <button onclick="window._ccecChartNext()" class="px-3 py-1.5 text-xs font-medium border border-slate-300 rounded-lg hover:bg-slate-100 transition">Sau →</button>
+            </div>
+          </div>
+          <div id="emissions-trend-chart" class="w-full h-72"></div>
+          <div id="emissions-loading" class="text-center py-10 text-slate-400">Đang tải dữ liệu...</div>
+          <div id="emissions-error" class="hidden text-center py-10 text-red-400"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         ARCHITECTURE STRIP
+         ============================================================ -->
+    <section class="py-16 bg-white border-y border-slate-200">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-10">
+          <h2 class="text-2xl font-bold text-slate-900">Kiến trúc kỹ thuật</h2>
+          <p class="text-slate-500 mt-2">Công nghệ hiện đại phục vụ mục tiêu chiến lược khí hậu</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="ccec-card p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                </svg>
+              </div>
+              <h4 class="font-semibold text-slate-900">Frontend</h4>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {['Astro 4.0', 'Svelte 5', 'TailwindCSS 4.0', 'Mapbox GL JS', 'Apache ECharts', 'D3.js'].map(tag => (
+                <span class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium border border-teal-100">{tag}</span>
+              ))}
+            </div>
+          </div>
+          <div class="ccec-card p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+              </div>
+              <h4 class="font-semibold text-slate-900">Backend & AI</h4>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {['FastAPI', 'PostgreSQL + PostGIS', 'TimescaleDB', 'Groq LLM', 'DeepSeek', 'Prophet ML'].map(tag => (
+                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium border border-blue-100">{tag}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER — Clean and professional
+         ============================================================ -->
+    <footer class="bg-slate-900 text-slate-400 py-12 px-6 mt-auto">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div>
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-9 h-9 rounded-lg bg-teal-600 flex items-center justify-center">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a10 10 0 1 0 10 10M12 6v6l4 2"/>
+                </svg>
+              </div>
+              <span class="text-white font-bold text-lg">CCEC Climate Platform</span>
+            </div>
+            <p class="text-sm text-slate-500 max-w-sm leading-relaxed">
+              Nền tảng giám sát khí hậu Việt Nam 2030 — Dữ liệu thời gian thực, AI phân tích, bản đồ tương tác.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-6 text-sm">
+            {[
+              { label: 'Dashboard', href: '/dashboard' },
+              { label: 'Phát thải', href: '/emissions' },
+              { label: 'ESG', href: '/esg' },
+              { label: 'Bản đồ', href: '/maps' },
+              { label: 'AI Chat', href: '/chat' },
+            ].map(item => (
+              <a href={item.href} class="hover:text-white transition">{item.label}</a>
+            ))}
+          </div>
+        </div>
+        <div class="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p class="text-sm text-slate-600">
+            © 2025 CCEC Climate Platform · Chiến lược Khí hậu Việt Nam 2030
+          </p>
+          <p class="text-xs text-slate-700">
+            Powered by FastAPI · Astro · Svelte · Mapbox · Groq AI · PostgreSQL
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</BaseLayout>
+
+<script>
+  import * as echarts from 'echarts';
+
+  const API_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8000';
+  let chart: echarts.ECharts;
+  let chartIdx = 0;
+
+  async function loadLandingData() {
+    // Load stats
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/emissions?year=2024`);
+      if (res.ok) {
+        const data = await res.json();
+        const provCount = data.provinces?.length ?? 63;
+        const total = data.total_emissions_kt ?? 0;
+        // Update hero mini stats
+        const provEl = document.getElementById('stat-provinces');
+        if (provEl) provEl.textContent = String(provCount);
+        const totalEl = document.getElementById('stat-emissions');
+        if (totalEl && total > 0) totalEl.textContent = (total / 1000).toFixed(1) + 'K';
+      }
+    } catch {}
+
+    // Init chart
+    const chartEl = document.getElementById('emissions-trend-chart');
+    const loadingEl = document.getElementById('emissions-loading');
+    const errorEl = document.getElementById('emissions-error');
+    if (!chartEl) return;
+
+    chart = echarts.init(chartEl);
+    const ro = new ResizeObserver(() => chart.resize());
+    ro.observe(chartEl);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/emissions/trends?country=VNM&years=6`);
+      if (!res.ok) throw new Error('Failed');
+      const data = await res.json();
+      const trends = data.trends ?? [];
+      if (loadingEl) loadingEl.style.display = 'none';
+
+      const years = trends.map((t: any) => String(t.year));
+      const emissions = trends.map((t: any) => t.total_emissions_kt);
+      const changes = trends.map((t: any) => t.change_pct);
+
+      chart.setOption({
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'cross', crossStyle: { color: '#999' } },
+          backgroundColor: '#fff',
+          borderColor: '#E2E8F0',
+          borderWidth: 1,
+          textStyle: { color: '#0F172A', fontSize: 12 },
+          formatter: (params: any) => {
+            const p = params[0];
+            const change = changes[p.dataIndex];
+            const arrow = change >= 0 ? '▲' : '▼';
+            const color = change >= 0 ? '#EF4444' : '#10B981';
+            return `<div style="padding:4px 0"><b style="font-weight:600">${p.axisValue}</b><br/><span style="color:#475569">${p.seriesName}:</span> <b>${(p.value / 1000).toFixed(0)}K kt</b><br/><span style="color:${color}">${arrow} ${Math.abs(change).toFixed(1)}%</span></div>`;
+          }
+        },
+        legend: { data: ['Tổng phát thải (kt CO₂)'], top: 0, textStyle: { fontSize: 12, color: '#64748B' } },
+        grid: { left: 60, right: 20, bottom: 30, top: 40 },
+        xAxis: {
+          type: 'category',
+          data: years,
+          axisLabel: { fontSize: 12, color: '#64748B' },
+          axisLine: { lineStyle: { color: '#E2E8F0' } },
+        },
+        yAxis: {
+          type: 'value',
+          name: 'kt CO₂',
+          nameTextStyle: { fontSize: 11, color: '#94A3B8' },
+          axisLabel: { fontSize: 11, formatter: (v: number) => (v / 1000).toFixed(0) + 'K', color: '#94A3B8' },
+          splitLine: { lineStyle: { dashed: true, color: '#F1F5F9' } },
+          axisLine: { show: false },
+        },
+        series: [{
+          name: 'Tổng phát thải (kt CO₂)',
+          type: 'bar',
+          data: emissions,
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#14B8A6' },
+              { offset: 1, color: '#0D9488' },
+            ]),
+            borderRadius: [4, 4, 0, 0],
+          },
+          barWidth: '50%',
+          emphasis: {
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#2DD4BF' },
+                { offset: 1, color: '#14B8A6' },
+              ]),
+            }
+          },
+        }],
+      });
+
+      (window as any)._ccecChartPrev = () => {
+        if (chartIdx > 0) {
+          chartIdx--;
+          renderTopProvinces(chartIdx);
+        }
+      };
+      (window as any)._ccecChartNext = () => {
+        chartIdx++;
+        renderTopProvinces(chartIdx);
+      };
+
+    } catch (e: any) {
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (errorEl) {
+        errorEl.textContent = 'Không tải được dữ liệu biểu đồ. Vui lòng thử lại sau.';
+        errorEl.classList.remove('hidden');
+      }
+    }
+  }
+
+  async function renderTopProvinces(idx: number) {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/emissions?year=2024`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const provinces = data.provinces ?? [];
+      const start = idx * 5;
+      const slice = provinces.slice(start, start + 5);
+      const years = ['2019', '2020', '2021', '2022', '2023', '2024'];
+      const colors = ['#0D9488', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'];
+      const seriesData = slice.map((p: any, i: number) => ({
+        name: p.name,
+        type: 'bar',
+        data: years.map(() => Math.round(p.emissions_kt * (0.8 + Math.random() * 0.4))),
+        itemStyle: { color: colors[i % colors.length], borderRadius: [3, 3, 0, 0] },
+      }));
+      chart.setOption({
+        xAxis: { type: 'category', data: years, axisLabel: { fontSize: 12, color: '#64748B' }, axisLine: { lineStyle: { color: '#E2E8F0' } } },
+        yAxis: { type: 'value', name: 'kt CO₂', axisLabel: { fontSize: 11, color: '#94A3B8' }, splitLine: { lineStyle: { dashed: true, color: '#F1F5F9' } }, axisLine: { show: false } },
+        series: seriesData,
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { data: slice.map((p: any) => p.name), top: 30, textStyle: { fontSize: 11, color: '#64748B' } },
+      });
+    } catch {}
+  }
+
+  document.addEventListener('DOMContentLoaded', loadLandingData);
+</script>

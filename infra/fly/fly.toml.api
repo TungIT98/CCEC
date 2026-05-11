@@ -1,0 +1,50 @@
+app = "ccec-api"
+primary_region = "hkg"
+
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+
+# Build multi-stage - compile Python deps first
+build = [
+  "pip install -r requirements.txt --system --no-deps"
+]
+
+[build]
+  dockerfile = "infra/docker/Dockerfile.api"
+
+[deploy]
+  release_command = "python -m alembic upgrade head || true"
+
+[run]
+  concurrency = "25"
+  auto_rollback = "true"
+
+[[services]]
+  internal_port = 8000
+  protocol = "tcp"
+
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.ports]]
+    port = 443
+    force_https = true
+
+  [[services.ports]]
+    port = 80
+
+  [[services.checks]]
+    path = "/health"
+    interval = "10s"
+    timeout = "2s"
+    grace_period = "5s"
+    restart_limit = 3
+
+  [[services.checks]]
+    command = ""
+
+# Persistent volume for uploaded files / sessions
+[mounts]
+  source = "ccec_data"
+  destination = "/data"

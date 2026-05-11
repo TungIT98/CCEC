@@ -1,0 +1,130 @@
+version: "3.9"
+
+services:
+  # --- Infrastructure ---
+
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: ccec_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: CHANGE_ME_postgres
+      POSTGRES_DB: ccec
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: ccec_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Application ---
+
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.api
+    container_name: ccec_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:CHANGE_ME_postgres@postgres:5432/ccec
+      DATABASE_URL_SYNC: postgresql+psycopg2://postgres:CHANGE_ME_postgres@postgres:5432/ccec
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: CHANGE_ME_USE_32_PLUS_RANDOM_CHARS_HERE
+      ACCESS_TOKEN_EXPIRE_MINUTES: 15
+      REFRESH_TOKEN_EXPIRE_DAYS: 7
+      OPENAI_API_KEY: ""
+      OPENAI_BASE_URL: https://api.groq.com/openai/v1
+      OPENAI_MODEL: llama-3.3-70b-versatile
+      DEBUG: "false"
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:4321"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  web:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.web
+    container_name: ccec_web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:4321"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4321 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # --- Monitoring ---
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: ccec_prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: ccec_grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: CHANGE_ME_grafana
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+
+# --- Volumes ---
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
