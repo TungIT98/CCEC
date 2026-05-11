@@ -1,14 +1,14 @@
 <section id="roadmap" class="py-24 px-6 bg-[#0B0F1A]">
   <div class="max-w-7xl mx-auto">
     <div class="text-center mb-16">
-      <p class="text-[#00E5A0] text-sm font-semibold uppercase tracking-widest mb-3">Roadmap</p>
+      <p class="text-[#F59E0B] text-sm font-semibold uppercase tracking-widest mb-3">Roadmap</p>
       <h2 class="text-4xl md:text-5xl font-bold text-[#F1F5F9] mb-4">What's Coming</h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {#each [
         {
-          quarter: 'Q2 2026', color: '#00E5A0',
+          quarter: 'Q2 2026', color: '#F59E0B',
           items: ['Core platform launch', 'Real-time rig monitoring', 'OpenWeatherMap integration', 'Free tier'],
         },
         {

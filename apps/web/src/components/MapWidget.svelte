@@ -127,14 +127,14 @@
   {/if}
 
   <div class="absolute top-2 left-2 z-10 bg-white/90 border border-slate-200 text-slate-600 text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5">
-    <svg class="w-3.5 h-3.5 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <svg class="w-3.5 h-3.5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
     OpenStreetMap — Toàn cầu, miễn phí
   </div>
 
   <div class="absolute top-2 right-2 z-10 flex gap-1.5">
     <button
       onclick={() => setLayer('climate')}
-      class="px-2.5 py-1 text-xs rounded-full font-medium transition-colors flex items-center gap-1 {activeLayer === 'climate' ? 'bg-teal-600 text-white' : 'bg-white/90 text-slate-600 hover:bg-white border border-slate-200 shadow-sm'}"
+      class="px-2.5 py-1 text-xs rounded-full font-medium transition-colors flex items-center gap-1 {activeLayer === 'climate' ? 'bg-amber-600 text-white' : 'bg-white/90 text-slate-600 hover:bg-white border border-slate-200 shadow-sm'}"
     >
       <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M12 2v5m0 0l-3-3m3 3l3-3"/></svg>
       Khí hậu
@@ -159,7 +159,7 @@
   {#if loading}
     <div class="absolute inset-0 flex items-center justify-center bg-slate-100">
       <div class="text-center">
-        <div class="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+        <div class="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
         <span class="text-slate-500 text-sm">Đang tải bản đồ...</span>
       </div>
     </div>

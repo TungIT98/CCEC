@@ -43,7 +43,7 @@ jobs:
         run: pnpm --filter @ccec/web lint 2>/dev/null || true
 
       - name: Build web
-        run: pnpm --filter @ccec/web build
+        run: PUBLIC_API_URL=http://ccec-api.fly.dev pnpm --filter @ccec/web build
 
   # ──────────────────────────────────────────────
   # Job 2: Build and push Docker images
@@ -107,12 +107,84 @@ jobs:
           platforms: linux/amd64
 
   # ──────────────────────────────────────────────
+  # Job 3b: Cloudflare DNS setup (for HTTPS SSL)
+  # ──────────────────────────────────────────────
+  cloudflare-dns:
+    name: Cloudflare DNS
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Cloudflare DNS
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "CLOUDFLARE_API_TOKEN not set — skipping DNS setup"
+            exit 0
+          fi
+          if [ -z "${{ secrets.CLOUDFLARE_ZONE }}" ]; then
+            echo "CLOUDFLARE_ZONE not set — skipping DNS setup"
+            echo "Set CLOUDFLARE_ZONE to your domain (e.g. example.com) in GitHub repo secrets"
+            exit 0
+          fi
+          CLOUDFLARE_TOKEN="${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          ZONE_NAME="${{ secrets.CLOUDFLARE_ZONE }}"
+          SUBDOMAIN="${CLOUDFLARE_SUBDOMAIN:-ccec}"
+          TARGET_HOST="${CF_TARGET_HOST:-ccec-web.fly.dev}"
+
+          echo "Zone: $ZONE_NAME | Subdomain: $SUBDOMAIN | Target: $TARGET_HOST"
+
+          ZONE_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=$ZONE_NAME" \
+            -H "Authorization: Bearer $CLOUDFLARE_TOKEN" \
+            -H "Content-Type: application/json")
+          ZONE_ID=$(echo "$ZONE_RESPONSE" | node -pe "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).result[0]?.id")
+
+          if [ -z "$ZONE_ID" ]; then
+            echo "Zone $ZONE_NAME not found. Create it at dash.cloudflare.com first."
+            echo "Zone Response: $ZONE_RESPONSE"
+            exit 1
+          fi
+          echo "Zone ID: $ZONE_ID"
+
+          # Check if CNAME exists
+          DNS_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=CNAME&name=$SUBDOMAIN.$ZONE_NAME" \
+            -H "Authorization: Bearer $CLOUDFLARE_TOKEN" \
+            -H "Content-Type: application/json")
+          RECORD_ID=$(echo "$DNS_RESPONSE" | node -pe "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).result[0]?.id // 'NONE'")
+
+          PAYLOAD=$(node -pe "JSON.stringify({type:'CNAME',name:'$SUBDOMAIN',content:'$TARGET_HOST',proxied:true,ttl:3600})")
+
+          if [ "$RECORD_ID" != "NONE" ]; then
+            echo "Updating CNAME record $RECORD_ID..."
+            RESULT=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+              -H "Authorization: Bearer $CLOUDFLARE_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD")
+          else
+            echo "Creating CNAME record..."
+            RESULT=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+              -H "Authorization: Bearer $CLOUDFLARE_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD")
+          fi
+          echo "Result: $RESULT"
+          SUCCESS=$(echo "$RESULT" | node -pe "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).success")
+          if [ "$SUCCESS" = "true" ]; then
+            echo "✅ Cloudflare DNS record created/updated successfully"
+          else
+            echo "❌ Failed — check CLOUDFLARE_API_TOKEN IP policy (must allow GitHub Actions IPs)"
+          fi
+
+  # ──────────────────────────────────────────────
   # Job 3: Deploy to Fly.io
   # ──────────────────────────────────────────────
   deploy:
     name: Deploy to Fly.io
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, cloudflare-dns]
     if: github.ref == 'refs/heads/main'
     environment:
       name: production

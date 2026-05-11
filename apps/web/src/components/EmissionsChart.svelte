@@ -132,13 +132,13 @@
   <div class="flex gap-2">
     <button
       onclick={() => { viewMode = 'trend'; loadData(); }}
-      class="px-4 py-1.5 text-sm rounded-full font-medium transition-colors {viewMode === 'trend' ? 'bg-teal-600 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}"
+      class="px-4 py-1.5 text-sm rounded-full font-medium transition-colors {viewMode === 'trend' ? 'bg-amber-600 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}"
     >
       Xu hướng phát thải
     </button>
     <button
       onclick={() => { viewMode = 'sector'; loadData(); }}
-      class="px-4 py-1.5 text-sm rounded-full font-medium transition-colors {viewMode === 'sector' ? 'bg-teal-600 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}"
+      class="px-4 py-1.5 text-sm rounded-full font-medium transition-colors {viewMode === 'sector' ? 'bg-amber-600 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}"
     >
       Theo ngành
     </button>
@@ -182,7 +182,7 @@
 
   {#if loading}
     <div class="text-center py-8">
-      <div class="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+      <div class="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
       <span class="text-slate-400 text-sm">Đang tải dữ liệu...</span>
     </div>
   {/if}

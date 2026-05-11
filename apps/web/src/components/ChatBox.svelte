@@ -60,7 +60,7 @@
     <div class="flex items-center justify-between max-w-3xl mx-auto">
       <div class="flex items-center gap-3">
         <a href="/" class="flex items-center gap-2.5 group">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center shadow-sm">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-sm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
@@ -72,8 +72,8 @@
       </div>
       {#if user}
         <div class="flex items-center gap-2 text-xs text-slate-500">
-          <div class="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center">
-            <svg class="w-3 h-3 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <div class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+            <svg class="w-3 h-3 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <span>{user.email}</span>
         </div>
@@ -86,7 +86,7 @@
     {#each messages as msg, i}
       {#if msg.role === 'user'}
         <div class="flex justify-end">
-          <div class="bg-teal-600 text-white rounded-2xl rounded-br-md px-4 py-3 max-w-xs text-sm shadow-sm">
+          <div class="bg-amber-600 text-white rounded-2xl rounded-br-md px-4 py-3 max-w-xs text-sm shadow-sm">
             {msg.content}
           </div>
         </div>
@@ -94,8 +94,8 @@
         <div class="flex justify-start">
           <div class="bg-white border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3 max-w-lg text-sm shadow-sm">
             <div class="flex items-center gap-2 mb-2">
-              <div class="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center">
-                <svg class="w-3 h-3 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M12 2v5m0 0l-3-3m3 3l3-3"/></svg>
+              <div class="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
+                <svg class="w-3 h-3 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M12 2v5m0 0l-3-3m3 3l3-3"/></svg>
               </div>
               <span class="text-xs text-slate-400">CCEC AI Assistant</span>
             </div>
@@ -104,7 +104,7 @@
         </div>
       {:else}
         <div class="flex justify-start">
-          <div class="bg-teal-50 border border-teal-100 rounded-xl px-4 py-3 text-sm text-teal-700 max-w-lg text-center mx-auto">
+          <div class="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-700 max-w-lg text-center mx-auto">
             {msg.content}
           </div>
         </div>
@@ -115,7 +115,7 @@
       <div class="flex justify-start">
         <div class="bg-white border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
           <div class="flex items-center gap-2 text-sm text-slate-400">
-            <div class="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+            <div class="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
             <span>AI đang trả lời...</span>
           </div>
         </div>
@@ -138,12 +138,12 @@
         onkeydown={handleKeydown}
         placeholder="Hỏi về chiến lược khí hậu, dữ liệu Vietnam, phân tích CNKI..."
         rows="2"
-        class="flex-1 resize-none px-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition text-sm"
+        class="flex-1 resize-none px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition text-sm"
       ></textarea>
       <button
         type="submit"
         disabled={loading || !input.trim()}
-        class="self-end bg-teal-600 text-white px-5 py-3 rounded-xl font-medium hover:bg-teal-700 disabled:opacity-40 transition shadow-sm"
+        class="self-end bg-amber-600 text-white px-5 py-3 rounded-xl font-medium hover:bg-amber-700 disabled:opacity-40 transition shadow-sm"
       >
         Gửi
       </button>

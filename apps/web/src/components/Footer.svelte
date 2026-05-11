@@ -3,7 +3,7 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
       <div>
         <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 rounded-lg bg-[#00E5A0] flex items-center justify-center">
+          <div class="w-8 h-8 rounded-lg bg-[#F59E0B] flex items-center justify-center">
             <span class="text-[#0B0F1A] font-bold text-sm">C</span>
           </div>
           <span class="font-semibold text-lg text-[#F1F5F9]">CCEC</span>
@@ -15,7 +15,7 @@
         <h4 class="text-[#F1F5F9] font-semibold text-sm mb-4">Product</h4>
         <ul class="space-y-2">
           {#each ['Features', 'Pricing', 'Roadmap', 'Documentation'] as link}
-            <li><a href="#" class="text-[#94A3B8] text-sm hover:text-[#00E5A0] transition-colors">{link}</a></li>
+            <li><a href="#" class="text-[#94A3B8] text-sm hover:text-[#F59E0B] transition-colors">{link}</a></li>
           {/each}
         </ul>
       </div>
@@ -24,7 +24,7 @@
         <h4 class="text-[#F1F5F9] font-semibold text-sm mb-4">Company</h4>
         <ul class="space-y-2">
           {#each ['About', 'Team', 'Blog', 'Careers'] as link}
-            <li><a href="#" class="text-[#94A3B8] text-sm hover:text-[#00E5A0] transition-colors">{link}</a></li>
+            <li><a href="#" class="text-[#94A3B8] text-sm hover:text-[#F59E0B] transition-colors">{link}</a></li>
           {/each}
         </ul>
       </div>
@@ -36,9 +36,9 @@
           <input
             type="email"
             placeholder="you@example.com"
-            class="flex-1 px-3 py-2 bg-[#1E293B] border border-[#334155] rounded-lg text-[#F1F5F9] text-sm placeholder-[#94A3B8] focus:outline-none focus:border-[#00E5A0]"
+            class="flex-1 px-3 py-2 bg-[#1E293B] border border-[#334155] rounded-lg text-[#F1F5F9] text-sm placeholder-[#94A3B8] focus:outline-none focus:border-[#F59E0B]"
           />
-          <button type="submit" class="px-4 py-2 bg-[#00E5A0] text-[#0B0F1A] rounded-lg text-sm font-semibold hover:bg-[#00C485] transition-colors">
+          <button type="submit" class="px-4 py-2 bg-[#F59E0B] text-[#0B0F1A] rounded-lg text-sm font-semibold hover:bg-[#FBBF24] transition-colors">
             →
           </button>
         </form>
@@ -49,7 +49,7 @@
       <p class="text-[#94A3B8] text-xs">© 2026 CCEC Climate Platform. All rights reserved.</p>
       <div class="flex gap-4">
         {#each ['Twitter', 'GitHub', 'Discord', 'LinkedIn'] as social}
-          <a href="#" class="text-[#94A3B8] hover:text-[#00E5A0] transition-colors text-xs">{social}</a>
+          <a href="#" class="text-[#94A3B8] hover:text-[#F59E0B] transition-colors text-xs">{social}</a>
         {/each}
       </div>
     </div>

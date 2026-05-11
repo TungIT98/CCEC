@@ -15,7 +15,7 @@
           highlight: false,
         },
         {
-          tier: 'Pro', price: '$49', period: '/month', color: '#00E5A0',
+          tier: 'Pro', price: '$49', period: '/month', color: '#F59E0B',
           features: ['50 rigs monitored', 'AI analytics', '90-day data history', 'Email alerts', 'API access'],
           cta: 'Start Pro Trial',
           highlight: true,
@@ -27,7 +27,7 @@
           highlight: false,
         },
       ] as plan}
-        <div class="rounded-2xl p-8 border {(plan.highlight ? 'bg-[#00E5A0]/5 border-[#00E5A0]/50' : 'bg-[#1E293B] border-[#334155]')}">
+        <div class="rounded-2xl p-8 border {(plan.highlight ? 'bg-[#F59E0B]/5 border-[#F59E0B]/50' : 'bg-[#1E293B] border-[#334155]')}">
           <div class="text-sm font-semibold mb-2" style="color: {plan.color}">{plan.tier}</div>
           <div class="flex items-baseline gap-1 mb-1">
             <span class="text-4xl font-bold text-[#F1F5F9]">{plan.price}</span>
@@ -44,7 +44,7 @@
           </ul>
           <a
             href="#"
-            class="block text-center py-3 rounded-xl text-sm font-semibold transition-colors {(plan.highlight ? 'bg-[#00E5A0] text-[#0B0F1A] hover:bg-[#00C485]' : 'border border-[#334155] text-[#F1F5F9] hover:border-[#334155]/80')}"
+            class="block text-center py-3 rounded-xl text-sm font-semibold transition-colors {(plan.highlight ? 'bg-[#F59E0B] text-[#0B0F1A] hover:bg-[#FBBF24]' : 'border border-[#334155] text-[#F1F5F9] hover:border-[#334155]/80')}"
           >
             {plan.cta}
           </a>

@@ -7,7 +7,7 @@ from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_
 
 from core.config import settings
 from models.database import init_db
-from routers import auth, users, climate_data, chat, maps, emissions
+from routers import auth, users, climate_data, chat, maps, emissions, notifications, team, carbon_credits, energy, policies, forecast, rag_search, openmeteo
 
 # --- Prometheus metrics ---
 REQUEST_COUNT = Counter(
@@ -25,11 +25,8 @@ REQUEST_LATENCY = Histogram(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: initialize DB tables
-    try:
-        await init_db()
-    except Exception:
-        pass  # DB may not be available in dev without Docker
+    # Startup: initialize DB tables (fails fast if DB is unreachable)
+    await init_db()
     yield
     # Shutdown
 
@@ -79,6 +76,14 @@ app.include_router(climate_data.router, prefix="/api/v1")
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(maps.router, prefix="/api/v1")
 app.include_router(emissions.router, prefix="/api/v1")
+app.include_router(notifications.router, prefix="/api/v1")
+app.include_router(team.router, prefix="/api/v1")
+app.include_router(carbon_credits.router, prefix="/api/v1")
+app.include_router(energy.router, prefix="/api/v1")
+app.include_router(policies.router, prefix="/api/v1")
+app.include_router(forecast.router, prefix="/api/v1")
+app.include_router(rag_search.router, prefix="/api/v1")
+app.include_router(openmeteo.router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["health"])
@@ -89,6 +94,13 @@ async def health():
 @app.get("/api/v1/health", tags=["health"])
 async def health_v1():
     return {"status": "ok", "version": settings.APP_VERSION}
+
+
+@app.get("/", tags=["redirect"])
+async def root():
+    """Redirect root to the web frontend for human browsers."""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="https://ccec-web.fly.dev")
 
 
 @app.get("/metrics", tags=["monitoring"])

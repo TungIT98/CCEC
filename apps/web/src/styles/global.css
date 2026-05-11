@@ -6,10 +6,10 @@
    ============================================================================= */
 
 :root {
-  /* Primary palette */
-  --color-primary:       #0D9488;  /* teal-700: main brand */
-  --color-primary-light: #14B8A6;  /* teal-500: hover/active */
-  --color-primary-dark:  #0F766E;  /* teal-800: dark contexts */
+  /* Primary palette — honey amber / bee theme */
+  --color-primary:       #F59E0B;  /* amber-500: main brand */
+  --color-primary-light: #FBBF24;  /* amber-400: hover/active */
+  --color-primary-dark:  #D97706;  /* amber-600: dark contexts */
 
   /* Accent — deep blue for contrast */
   --color-accent:        #1E40AF;  /* blue-800 */
@@ -37,7 +37,7 @@
   --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
   --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
-  --shadow-glow: 0 0 20px rgb(20 184 166 / 0.15);
+  --shadow-glow: 0 0 20px rgb(245 158 11 / 0.15);
 }
 
 /* =============================================================================
@@ -111,13 +111,13 @@ h1, h2, h3, h4, h5, h6 {
   border: none;
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-  box-shadow: 0 1px 3px rgb(13 148 136 / 0.3);
+  box-shadow: 0 1px 3px rgb(245 158 11 / 0.3);
   text-decoration: none;
 }
 .ccec-btn-primary:hover {
   opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgb(13 148 136 / 0.35);
+  box-shadow: 0 4px 12px rgb(245 158 11 / 0.35);
 }
 .ccec-btn-primary:active {
   transform: translateY(0);
@@ -155,8 +155,8 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.75rem;
   font-weight: 500;
 }
-.ccec-badge-teal {
-  background: rgb(20 184 166 / 0.1);
+.ccec-badge-amber-main {
+  background: rgb(245 158 11 / 0.1);
   color: var(--color-primary);
 }
 .ccec-badge-blue {

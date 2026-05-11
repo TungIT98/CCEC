@@ -3,17 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Đăng nhập — CCEC Climate Platform">
-  <div class="min-h-screen bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-700 flex items-center justify-center px-4">
+  <div class="min-h-screen bg-gradient-to-br from-amber-700 via-amber-600 to-emerald-700 flex items-center justify-center px-4">
     <div class="w-full max-w-md">
       <!-- Logo -->
       <div class="text-center mb-8">
         <div class="inline-flex items-center gap-3 mb-4">
-          <div class="w-12 h-12 rounded-xl bg-teal-500 flex items-center justify-center font-bold text-2xl text-white shadow-lg">
+          <div class="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center font-bold text-2xl text-white shadow-lg">
             CCEC
           </div>
         </div>
         <h1 class="text-2xl font-bold text-white">CCEC Climate Platform</h1>
-        <p class="text-teal-200 mt-1 text-sm">Đăng nhập để truy cập dashboard khí hậu</p>
+        <p class="text-amber-200 mt-1 text-sm">Đăng nhập để truy cập dashboard khí hậu</p>
       </div>
 
       <!-- Login Card -->
@@ -29,7 +29,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
               required
               autocomplete="email"
               placeholder="you@example.com"
-              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition text-sm"
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-amber-200 outline-none transition text-sm"
             />
           </div>
           <div>
@@ -40,7 +40,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
               required
               autocomplete="current-password"
               placeholder="••••••••"
-              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition text-sm"
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-amber-200 outline-none transition text-sm"
             />
           </div>
 
@@ -49,7 +49,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <button
             id="login-btn"
             type="submit"
-            class="w-full bg-teal-700 text-white py-2.5 rounded-lg font-semibold hover:bg-teal-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full bg-amber-700 text-white py-2.5 rounded-lg font-semibold hover:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Đăng nhập
           </button>
@@ -58,7 +58,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div class="mt-4 text-center">
           <p class="text-sm text-slate-500">
             Chưa có tài khoản?
-            <button id="register-toggle" class="text-teal-700 hover:underline font-medium">Đăng ký ngay</button>
+            <button id="register-toggle" class="text-amber-700 hover:underline font-medium">Đăng ký ngay</button>
           </p>
         </div>
 
@@ -73,7 +73,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
               required
               autocomplete="email"
               placeholder="you@example.com"
-              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition text-sm"
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-amber-200 outline-none transition text-sm"
             />
           </div>
           <div>
@@ -85,7 +85,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
               autocomplete="new-password"
               placeholder="•••••••• (tối thiểu 8 ký tự)"
               minlength="8"
-              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition text-sm"
+              class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-amber-200 outline-none transition text-sm"
             />
           </div>
           <div id="reg-error" class="hidden text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2"></div>
@@ -93,7 +93,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <button
             id="register-btn"
             type="submit"
-            class="w-full bg-teal-100 text-teal-800 py-2.5 rounded-lg font-semibold hover:bg-teal-200 transition disabled:opacity-50"
+            class="w-full bg-amber-100 text-amber-800 py-2.5 rounded-lg font-semibold hover:bg-amber-200 transition disabled:opacity-50"
           >
             Tạo tài khoản
           </button>
@@ -104,7 +104,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
         <div class="mt-6 pt-4 border-t border-slate-100">
           <p class="text-xs text-slate-400 text-center">
-            <a href="/" class="hover:text-teal-600">← Quay về trang chủ</a>
+            <a href="/" class="hover:text-amber-600">← Quay về trang chủ</a>
           </p>
         </div>
       </div>

@@ -17,34 +17,46 @@ class AIService:
 
         return self._client
 
-    async def chat(self, message: str, model: Optional[str] = None) -> str:
-        """Send a chat message to the AI provider."""
-        actual_model = model or settings.MINIMAX_MODEL
+    async def chat(
+        self,
+        message: str,
+        model: Optional[str] = None,
+        system_prompt: Optional[str] = None,
+    ) -> str:
+        """Send a chat message (non-streaming)."""
+        result = []
+        async for chunk in self.stream_chat(message, model=model, system_prompt=system_prompt):
+            result.append(chunk)
+        return "".join(result)
 
-        system_prompt = (
-            "You are a climate expert assistant for the CCEC Climate Platform. "
-            "Answer questions about climate change, carbon markets, Vietnam climate policy, "
-            "emissions data, and related topics. Be concise, accurate, and helpful. "
-            "When referencing data, mention its source and limitations."
-        )
+    async def stream_chat(
+        self,
+        message: str,
+        model: Optional[str] = None,
+        system_prompt: Optional[str] = None,
+    ):
+        """Stream chat tokens — yields str chunks."""
+        if system_prompt is None:
+            from routers.chat import BASE_SYSTEM_PROMPT as _sp
+            system_prompt = _sp
 
         try:
-            response = await self.client.chat.completions.create(
-                model=settings.MINIMAX_MODEL,
+            stream = await self.client.chat.completions.create(
+                model=model or settings.MINIMAX_MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": message},
                 ],
                 temperature=0.7,
                 max_tokens=1024,
+                stream=True,
             )
-            return response.choices[0].message.content or "No response generated."
+            async for chunk in stream:
+                content = chunk.choices[0].delta.content
+                if content:
+                    yield content
         except Exception as e:
-            return (
-                f"[AI service unavailable: {type(e).__name__}] "
-                "I'm operating in demo mode. Please configure MINIMAX_API_KEY in .env "
-                "(get your key from https://platform.minimax.io)."
-            )
+            yield f"[AI unavailable: {type(e).__name__}] Demo mode."
 
 
 ai_service = AIService()

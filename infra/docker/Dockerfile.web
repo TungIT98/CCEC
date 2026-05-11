@@ -2,6 +2,10 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Set API URL for Astro build (Vite env var)
+ARG PUBLIC_API_URL=http://ccec-api.fly.dev
+ENV PUBLIC_API_URL=$PUBLIC_API_URL
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10.25.0 --activate
 

@@ -1,7 +1,7 @@
 <section id="features" class="py-24 px-6 bg-[#0B0F1A]">
   <div class="max-w-7xl mx-auto">
     <div class="text-center mb-16">
-      <p class="text-[#00E5A0] text-sm font-semibold uppercase tracking-widest mb-3">Features</p>
+      <p class="text-[#F59E0B] text-sm font-semibold uppercase tracking-widest mb-3">Features</p>
       <h2 class="text-4xl md:text-5xl font-bold text-[#F1F5F9] mb-4">Built for Climate Intelligence</h2>
       <p class="text-[#94A3B8] max-w-2xl mx-auto">
         End-to-end platform for monitoring, analyzing, and optimizing crypto operations under climate constraints.
@@ -17,7 +17,7 @@
         { icon: '🗺️', title: 'Interactive Maps', desc: 'Geographic visualization of your mining operations with climate risk overlays and efficiency heatmaps.' },
         { icon: '📊', title: 'Open Data', desc: 'Public API and datasets for community research on crypto mining and climate impact.' },
       ] as feature}
-        <div class="bg-[#1E293B] rounded-2xl p-6 border border-[#334155] hover:border-[#00E5A0]/50 transition-colors group">
+        <div class="bg-[#1E293B] rounded-2xl p-6 border border-[#334155] hover:border-[#F59E0B]/50 transition-colors group">
           <div class="text-4xl mb-4">{feature.icon}</div>
           <h3 class="text-xl font-semibold text-[#F1F5F9] mb-2">{feature.title}</h3>
           <p class="text-[#94A3B8] text-sm leading-relaxed">{feature.desc}</p>

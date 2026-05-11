@@ -1,19 +1,32 @@
 /**
  * CCEC Climate Platform — OpenAI-compatible AI client.
  * Unified interface across Groq, DeepSeek, Portkey.
+ * Climate-domain customization: tools, system prompts, MiniMax primary.
  *
  * Usage:
- *   import { createAI, AIProvider } from '@ccec/ai-client';
+ *   import { createAI, createClimateAI } from '@ccec/ai-client';
  *
+ *   // Generic
  *   const ai = createAI({ provider: 'groq', apiKey: process.env.GROQ_API_KEY });
- *   const res = await ai.chat({ model: 'llama-3.3-70b-versatile', messages: [...] });
+ *
+ *   // Climate-domain (MiniMax primary, Vietnam context, climate tools)
+ *   const climateAI = createClimateAI({ apiKey: process.env.MINIMAX_API_KEY });
+ *   const res = await climateAI.chat({ messages: [{ role: 'user', content: '...' }] });
  */
 
 export * from './models.js';
-export { chat as groqChat, stream as groqStream } from './providers/groq.js';
-export { chat as deepseekChat, stream as deepseekStream } from './providers/deepseek.js';
-export { chat as portkeyChat, stream as portkeyStream } from './providers/portkey.js';
-export { chat as minimaxChat, stream as minimaxStream } from './providers/minimax.js';
+export {
+  chat as groqChat, stream as groqStream,
+} from './providers/groq.js';
+export {
+  chat as deepseekChat, stream as deepseekStream,
+} from './providers/deepseek.js';
+export {
+  chat as portkeyChat, stream as portkeyStream,
+} from './providers/portkey.js';
+export {
+  chat as minimaxChat, stream as minimaxStream,
+} from './providers/minimax.js';
 
 // ---------------------------------------------------------------------------
 // Unified client factory
@@ -21,6 +34,7 @@ export { chat as minimaxChat, stream as minimaxStream } from './providers/minima
 
 import {
   MODELS,
+  VIETNAM_CLIMATE_CONTEXT,
   type ChatCompletionResponse,
   type ChatOptions,
   type ModelInfo,
@@ -158,3 +172,89 @@ export type { GroqConfig } from './providers/groq.js';
 export type { DeepSeekConfig } from './providers/deepseek.js';
 export type { PortKeyConfig } from './providers/portkey.js';
 export type { MiniMaxConfig } from './providers/minimax.js';
+export { CLIMATE_TOOLS } from './models.js';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Climate-domain factory — MiniMax primary, Groq fallback
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ClimateAIOptions {
+  apiKey?: string;
+  groqApiKey?: string;
+  minimaxApiKey?: string;
+  defaultModel?: string;
+  temperature?: number;
+}
+
+/**
+ * Climate-domain AI client.
+ * Auto-selects MiniMax (primary, 1M context) → Groq (fast fallback).
+ * Injects VIETNAM_CLIMATE_CONTEXT as system prompt.
+ * Registers CLIMATE_TOOLS for structured climate tasks.
+ */
+export function createClimateAI(options: ClimateAIOptions): AIClient {
+  const miniKey = options.minimaxApiKey ?? options.apiKey;
+  const groqKey = options.groqApiKey ?? options.apiKey;
+
+  // Primary: MiniMax
+  const primary = createAI({
+    provider: 'minimax',
+    apiKey: miniKey ?? '',
+    defaultModel: options.defaultModel ?? 'MiniMax-M2.7',
+  });
+
+  // Fallback: Groq
+  const fallback = createAI({
+    provider: 'groq',
+    apiKey: groqKey ?? '',
+    defaultModel: 'llama-3.3-70b-versatile',
+  });
+
+  const systemMsg = {
+    role: 'system' as const,
+    content: VIETNAM_CLIMATE_CONTEXT,
+  };
+
+  const injectedChat = (
+    opts: Omit<ChatOptions, 'model'>,
+    client: AIClient,
+  ): Promise<ChatCompletionResponse> => {
+    const messages = [systemMsg, ...opts.messages];
+    return client.chat({ ...opts, messages });
+  };
+
+  return {
+    provider: 'minimax',
+    defaultModel: primary.defaultModel,
+
+    async chat(opts: Omit<ChatOptions, 'model'>): Promise<ChatCompletionResponse> {
+      try {
+        return await injectedChat(opts, primary);
+      } catch {
+        // Groq fallback
+        return await injectedChat(opts, fallback);
+      }
+    },
+
+    stream(opts: Omit<ChatOptions, 'model'>): AsyncGenerator<string> {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return climateStream(opts, primary, fallback);
+    },
+
+    listModels(): ModelInfo[] {
+      return [...MODELS.minimax, ...MODELS.groq];
+    },
+  };
+}
+
+async function* climateStream(
+  opts: Omit<ChatOptions, 'model'>,
+  primary: AIClient,
+  fallback: AIClient,
+): AsyncGenerator<string> {
+  try {
+    yield* primary.stream(opts);
+  } catch {
+    yield* fallback.stream(opts);
+  }
+}

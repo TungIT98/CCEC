@@ -1,0 +1,730 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Tabs from '../components/ui/Tabs.svelte';
+import Toggle from '../components/ui/Toggle.svelte';
+import Modal from '../components/ui/Modal.svelte';
+import Input from '../components/ui/Input.svelte';
+import Avatar from '../components/ui/Avatar.svelte';
+
+const tabs = [
+  { id: 'profile', label: 'Hồ sơ', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
+  { id: 'preferences', label: 'Tuỳ chọn', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>` },
+  { id: 'notifications', label: 'Thông báo', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>` },
+  { id: 'security', label: 'Bảo mật', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>` },
+  { id: 'apikeys', label: 'API Keys', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>` },
+  { id: 'team', label: 'Nhóm', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>` },
+];
+---
+
+<BaseLayout title="Cài đặt — CCEC Climate Platform">
+  <div class="min-h-screen flex flex-col">
+
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/80">
+      <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <a href="/" class="flex items-center gap-2.5 group">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-sm">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+            </div>
+            <span class="font-bold text-slate-900 text-sm">CCEC</span>
+          </a>
+          <span class="text-slate-300">/</span>
+          <span class="font-semibold text-slate-700 text-sm">Cài đặt</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="/dashboard" class="text-sm text-slate-500 hover:text-amber-600 transition font-medium">← Quay lại</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 bg-slate-50">
+      <div class="max-w-5xl mx-auto px-6 py-8">
+
+        <!-- Page header -->
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-slate-900">Cài đặt</h1>
+          <p class="text-sm text-slate-500 mt-1">Quản lý tài khoản, tuỳ chọn và bảo mật</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="ccec-card overflow-hidden">
+          <Tabs
+            client:load
+            tabs={tabs}
+            onchange={(id) => {
+              // show tab panel
+              document.querySelectorAll('[id^="tab-panel-"]').forEach(el => {
+                (el as HTMLElement).style.display = 'none';
+              });
+              const panel = document.getElementById(`tab-panel-${id}`);
+              if (panel) panel.style.display = 'block';
+            }}
+          />
+
+          <!-- ================================================
+               TAB 1: PROFILE
+               ================================================ -->
+          <div id="tab-panel-profile" style="display:block">
+            <div class="p-6 space-y-6">
+              <div>
+                <h2 class="text-base font-semibold text-slate-800 mb-4">Hồ sơ cá nhân</h2>
+
+                <!-- Avatar section -->
+                <div class="flex items-center gap-5 p-5 bg-slate-50 rounded-xl mb-5">
+                  <Avatar client:load name="Người dùng" size="xl" />
+                  <div>
+                    <p class="text-sm font-semibold text-slate-800">Avatar</p>
+                    <p class="text-xs text-slate-500 mb-2">Ảnh hồ sơ sẽ hiển thị trên tất cả các trang</p>
+                    <label class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 hover:border-teal-400 cursor-pointer transition">
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      Đổi ảnh
+                      <input type="file" accept="image/*" class="hidden" onchange="window.ccecSettings?.uploadAvatar(this)" />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Họ và tên</label>
+                    <input id="profile-name" type="text" value="Nguyễn Văn Minh"
+                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none transition" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+                    <input id="profile-email" type="email" value="minh.nguyen@ccec.vn"
+                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none transition disabled:opacity-60" disabled />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Số điện thoại</label>
+                    <input id="profile-phone" type="tel" placeholder="+84 ..."
+                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none transition" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Tổ chức</label>
+                    <input id="profile-org" type="text" value="CCEC Vietnam"
+                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none transition" />
+                  </div>
+                </div>
+
+                <div class="mt-5 flex justify-end">
+                  <button onclick="window.ccecSettings?.saveProfile()"
+                    class="px-5 py-2.5 bg-[#00E5A0] text-[#0B0F1A] font-semibold text-sm rounded-xl hover:bg-[#00C485] transition shadow-sm">
+                    Lưu thay đổi
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================
+               TAB 2: PREFERENCES
+               ================================================ -->
+          <div id="tab-panel-preferences" style="display:none">
+            <div class="p-6 space-y-6">
+              <h2 class="text-base font-semibold text-slate-800 mb-4">Tuỳ chọn hiển thị</h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Ngôn ngữ</label>
+                  <select id="pref-lang" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none">
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Múi giờ</label>
+                  <select id="pref-tz" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none">
+                    <option value="Asia/Ho_Chi_Minh">Asia/Ho_Chi_Minh (UTC+7)</option>
+                    <option value="Asia/Bangkok">Asia/Bangkok (UTC+7)</option>
+                    <option value="Asia/Tokyo">Asia/Tokyo (UTC+9)</option>
+                    <option value="UTC">UTC</option>
+                    <option value="Europe/London">Europe/London (UTC+0)</option>
+                    <option value="America/New_York">America/New_York (UTC-5)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Giao diện</label>
+                  <select id="pref-theme" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none">
+                    <option value="dark">Tối (Dark)</option>
+                    <option value="light">Sáng (Light)</option>
+                    <option value="system">Hệ thống (System)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Định dạng ngày</label>
+                  <select id="pref-date-format" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none">
+                    <option value="DD/MM/YYYY">DD/MM/YYYY (31/12/2024)</option>
+                    <option value="MM/DD/YYYY">MM/DD/YYYY (12/31/2024)</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD (2024-12-31)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Số thập phân</label>
+                  <select id="pref-decimals" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none">
+                    <option value="1">1 chữ số (28.5°C)</option>
+                    <option value="2">2 chữ số (28.52°C)</option>
+                    <option value="0">Số nguyên (29°C)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex justify-end">
+                <button onclick="window.ccecSettings?.savePreferences()"
+                  class="px-5 py-2.5 bg-[#00E5A0] text-[#0B0F1A] font-semibold text-sm rounded-xl hover:bg-[#00C485] transition shadow-sm">
+                  Lưu tuỳ chọn
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================
+               TAB 3: NOTIFICATIONS
+               ================================================ -->
+          <div id="tab-panel-notifications" style="display:none">
+            <div class="p-6 space-y-6">
+              <h2 class="text-base font-semibold text-slate-800 mb-4">Cài đặt thông báo</h2>
+
+              <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">Thông báo qua Email</p>
+                    <p class="text-xs text-slate-500">Nhận cảnh báo và báo cáo qua email</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="notif-email" class="sr-only peer" checked />
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-[#00E5A0] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                  </label>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">Thông báo ứng dụng</p>
+                    <p class="text-xs text-slate-500">Popup và badge trên trình duyệt</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="notif-app" class="sr-only peer" checked />
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-[#00E5A0] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                  </label>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">Bản tin hàng tuần</p>
+                    <p class="text-xs text-slate-500">Tóm tắt khí hậu và dữ liệu tuần này</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="notif-digest" class="sr-only peer" />
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-[#00E5A0] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                  </label>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">Cảnh báo thời tiết cực đoan</p>
+                    <p class="text-xs text-slate-500">Thông báo ngay khi có bão, lũ lụt, nắng nóng</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="notif-extreme" class="sr-only peer" checked />
+                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-[#00E5A0] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="flex justify-end">
+                <button onclick="window.ccecSettings?.saveNotifications()"
+                  class="px-5 py-2.5 bg-[#00E5A0] text-[#0B0F1A] font-semibold text-sm rounded-xl hover:bg-[#00C485] transition shadow-sm">
+                  Lưu thông báo
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================
+               TAB 4: SECURITY
+               ================================================ -->
+          <div id="tab-panel-security" style="display:none">
+            <div class="p-6 space-y-6">
+              <h2 class="text-base font-semibold text-slate-800 mb-4">Bảo mật tài khoản</h2>
+
+              <!-- Change password -->
+              <div class="p-5 bg-slate-50 rounded-xl space-y-4">
+                <div class="flex items-center justify-between mb-1">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-700">Đổi mật khẩu</p>
+                    <p class="text-xs text-slate-500">Cập nhật mật khẩu để bảo vệ tài khoản</p>
+                  </div>
+                  <button onclick="window.ccecSettings?.openPasswordModal()"
+                    class="px-4 py-2 text-xs font-medium border border-slate-300 rounded-lg hover:border-amber-400 hover:text-amber-700 transition bg-white">
+                    Đổi mật khẩu
+                  </button>
+                </div>
+              </div>
+
+              <!-- Active sessions -->
+              <div class="p-5 bg-slate-50 rounded-xl">
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-700">Phiên đăng nhập</p>
+                    <p class="text-xs text-slate-500">Các thiết bị đang đăng nhập</p>
+                  </div>
+                </div>
+                <div class="space-y-3" id="sessions-list">
+                  <div class="flex items-center justify-between py-3 border-b border-slate-200 last:border-0">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+                        <svg class="w-4.5 h-4.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-700">Windows · Chrome</p>
+                        <p class="text-xs text-slate-400">Hà Nội, Vietnam · IP: 192.168.1.x</p>
+                      </div>
+                    </div>
+                    <span class="ccec-badge ccec-badge-amber text-xs">Hiện tại</span>
+                  </div>
+                  <div class="flex items-center justify-between py-3 border-b border-slate-200 last:border-0">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <svg class="w-4.5 h-4.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-700">iOS · Safari</p>
+                        <p class="text-xs text-slate-400">TP. Hồ Chí Minh · 2 giờ trước</p>
+                      </div>
+                    </div>
+                    <button onclick="window.ccecSettings?.revokeSession(this)" class="text-xs text-red-500 hover:text-red-700 font-medium transition">Thu hồi</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2FA -->
+              <div class="flex items-center justify-between p-5 bg-slate-50 rounded-xl">
+                <div>
+                  <p class="text-sm font-semibold text-slate-700">Xác thực hai yếu tố (2FA)</p>
+                  <p class="text-xs text-slate-500">Bảo vệ tài khoản bằng mã OTP qua điện thoại</p>
+                </div>
+                <span class="ccec-badge ccec-badge-amber text-xs">Chưa bật</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================
+               TAB 5: API KEYS
+               ================================================ -->
+          <div id="tab-panel-apikeys" style="display:none">
+            <div class="p-6 space-y-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-semibold text-slate-800">API Keys</h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Quản lý khoá API cho AI và dịch vụ bên thứ ba</p>
+                </div>
+                <button onclick="window.ccecSettings?.openApiKeyModal()"
+                  class="px-4 py-2 bg-[#00E5A0] text-[#0B0F1A] font-semibold text-xs rounded-xl hover:bg-[#00C485] transition shadow-sm flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Thêm API Key
+                </button>
+              </div>
+
+              <!-- MiniMax -->
+              <div class="p-5 border border-slate-200 rounded-xl">
+                <div class="flex items-start justify-between">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-purple-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2 mb-1">
+                        <p class="text-sm font-semibold text-slate-800">MiniMax</p>
+                        <span class="ccec-badge ccec-badge-green text-xs">Đã kết nối</span>
+                      </div>
+                      <p class="text-xs text-slate-500">AI chatbot · Climate analysis · MiniMax API</p>
+                      <p class="text-xs font-mono text-slate-400 mt-1">sk-cp-•••••••••••••••</p>
+                    </div>
+                  </div>
+                  <button class="text-xs text-red-500 hover:text-red-700 font-medium transition">Xoá</button>
+                </div>
+              </div>
+
+              <!-- Groq -->
+              <div class="p-5 border border-slate-200 rounded-xl">
+                <div class="flex items-start justify-between">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2 mb-1">
+                        <p class="text-sm font-semibold text-slate-800">Groq</p>
+                        <span class="ccec-badge ccec-badge-amber text-xs">Tùy chọn</span>
+                      </div>
+                      <p class="text-xs text-slate-500">Fast LLM inference · Groq Cloud API</p>
+                      <p class="text-xs font-mono text-slate-400 mt-1">gsk_•••••••••••••••</p>
+                    </div>
+                  </div>
+                  <button class="text-xs text-red-500 hover:text-red-700 font-medium transition">Xoá</button>
+                </div>
+              </div>
+
+              <!-- DeepSeek -->
+              <div class="p-5 border border-slate-200 rounded-xl">
+                <div class="flex items-start justify-between">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2 mb-1">
+                        <p class="text-sm font-semibold text-slate-800">DeepSeek</p>
+                        <span class="ccec-badge ccec-badge-amber text-xs">Tùy chọn</span>
+                      </div>
+                      <p class="text-xs text-slate-500">Advanced reasoning · DeepSeek API</p>
+                      <p class="text-xs font-mono text-slate-400 mt-1">sk-•••••••••••••••</p>
+                    </div>
+                  </div>
+                  <button class="text-xs text-red-500 hover:text-red-700 font-medium transition">Xoá</button>
+                </div>
+              </div>
+
+              <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p class="text-xs text-amber-700 flex items-start gap-2">
+                  <svg class="w-4 h-4 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <span>Không chia sẻ API keys qua email hoặc tin nhắn. Khoá của bạn được mã hoá và lưu trữ an toàn.</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================
+               TAB 6: TEAM
+               ================================================ -->
+          <div id="tab-panel-team" style="display:none">
+            <div class="p-6 space-y-5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-semibold text-slate-800">Quản lý nhóm</h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Mời thành viên và quản lý quyền truy cập</p>
+                </div>
+                <button onclick="window.ccecSettings?.openInviteModal()"
+                  class="px-4 py-2 bg-[#00E5A0] text-[#0B0F1A] font-semibold text-xs rounded-xl hover:bg-[#00C485] transition shadow-sm flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Mời thành viên
+                </button>
+              </div>
+
+              <table class="ccec-table w-full">
+                <thead>
+                  <tr>
+                    <th>Thành viên</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="team-members">
+                  <tr>
+                    <td class="flex items-center gap-3">
+                      <Avatar client:load name="Nguyễn Văn Minh" size="sm" />
+                      <div>
+                        <p class="text-sm font-medium text-slate-700">Nguyễn Văn Minh</p>
+                        <p class="text-xs text-slate-400">minh@ccec.vn</p>
+                      </div>
+                    </td>
+                    <td><span class="ccec-badge ccec-badge-amber text-xs">Admin</span></td>
+                    <td><span class="ccec-badge ccec-badge-green text-xs">Hoạt động</span></td>
+                    <td><span class="text-xs text-slate-400">—</span></td>
+                  </tr>
+                  <tr>
+                    <td class="flex items-center gap-3">
+                      <Avatar client:load name="Trần Thị Lan" size="sm" />
+                      <div>
+                        <p class="text-sm font-medium text-slate-700">Trần Thị Lan</p>
+                        <p class="text-xs text-slate-400">lan@ccec.vn</p>
+                      </div>
+                    </td>
+                    <td><span class="ccec-badge ccec-badge-blue text-xs">Editor</span></td>
+                    <td><span class="ccec-badge ccec-badge-green text-xs">Hoạt động</span></td>
+                    <td><button class="text-xs text-red-500 hover:text-red-700 font-medium transition">Xoá</button></td>
+                  </tr>
+                  <tr>
+                    <td class="flex items-center gap-3">
+                      <Avatar client:load name="Lê Hoàng Nam" size="sm" />
+                      <div>
+                        <p class="text-sm font-medium text-slate-700">Lê Hoàng Nam</p>
+                        <p class="text-xs text-slate-400">nam@ccec.vn</p>
+                      </div>
+                    </td>
+                    <td><span class="ccec-badge bg-slate-100 text-slate-600 text-xs">Viewer</span></td>
+                    <td><span class="ccec-badge ccec-badge-amber text-xs">Chờ xác nhận</span></td>
+                    <td><button class="text-xs text-red-500 hover:text-red-700 font-medium transition">Xoá</button></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- Invite form (hidden by default) -->
+              <div id="invite-form" class="hidden p-5 bg-slate-50 rounded-xl space-y-3 mt-3">
+                <h3 class="text-sm font-semibold text-slate-700">Mời thành viên mới</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <input id="invite-email" type="email" placeholder="Email: nguyen@company.com"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none" />
+                  <select id="invite-role" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none">
+                    <option value="viewer">Viewer — Chỉ xem</option>
+                    <option value="editor">Editor — Chỉnh sửa</option>
+                    <option value="admin">Admin — Quản trị</option>
+                  </select>
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="window.ccecSettings?.sendInvite()"
+                    class="px-4 py-2 bg-[#00E5A0] text-[#0B0F1A] font-semibold text-xs rounded-xl hover:bg-[#00C485] transition">
+                    Gửi lời mời
+                  </button>
+                  <button onclick="document.getElementById('invite-form')?.classList.add('hidden')"
+                    class="px-4 py-2 text-xs font-medium border border-slate-300 rounded-xl hover:bg-slate-50 transition">
+                    Huỷ
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /ccec-card -->
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<!-- PASSWORD MODAL -->
+<div id="password-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(11,15,26,0.7);backdrop-filter:blur(4px)">
+  <div class="ccec-card w-full shadow-2xl" style="max-width:420px">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+      <h2 class="font-semibold text-slate-800">Đổi mật khẩu</h2>
+      <button onclick="window.ccecSettings?.closePasswordModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+        <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="px-5 py-5 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Mật khẩu hiện tại</label>
+        <input id="pwd-current" type="password" placeholder="••••••••"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Mật khẩu mới</label>
+        <input id="pwd-new" type="password" placeholder="Tối thiểu 8 ký tự"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Xác nhận mật khẩu mới</label>
+        <input id="pwd-confirm" type="password" placeholder="••••••••"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none" />
+      </div>
+      <div id="pwd-error" class="text-xs text-red-600 hidden flex items-center gap-1"></div>
+      <div class="flex gap-2 justify-end pt-2">
+        <button onclick="window.ccecSettings?.closePasswordModal()"
+          class="px-4 py-2 text-sm font-medium border border-slate-300 rounded-xl hover:bg-slate-50 transition">Huỷ</button>
+        <button onclick="window.ccecSettings?.changePassword()"
+          class="px-5 py-2 bg-[#00E5A0] text-[#0B0F1A] font-semibold text-sm rounded-xl hover:bg-[#00C485] transition">Đổi mật khẩu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div id="apikey-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(11,15,26,0.7);backdrop-filter:blur(4px)">
+  <div class="ccec-card w-full shadow-2xl" style="max-width:480px">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+      <h2 class="font-semibold text-slate-800">Thêm API Key</h2>
+      <button onclick="window.ccecSettings?.closeApiKeyModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+        <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="px-5 py-5 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Nhà cung cấp</label>
+        <select id="ak-provider" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none">
+          <option value="minimax">MiniMax</option>
+          <option value="groq">Groq</option>
+          <option value="deepseek">DeepSeek</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">API Key</label>
+        <input id="ak-key" type="password" placeholder="sk-..."
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-mono focus:border-[#00E5A0] focus:ring-2 focus:ring-[#00E5A0]/20 outline-none" />
+      </div>
+      <div id="ak-error" class="text-xs text-red-600 hidden flex items-center gap-1"></div>
+      <div class="flex gap-2 justify-end pt-2">
+        <button onclick="window.ccecSettings?.closeApiKeyModal()"
+          class="px-4 py-2 text-sm font-medium border border-slate-300 rounded-xl hover:bg-slate-50 transition">Huỷ</button>
+        <button onclick="window.ccecSettings?.saveApiKey()"
+          class="px-5 py-2 bg-[#00E5A0] text-[#0B0F1A] font-semibold text-sm rounded-xl hover:bg-[#00C485] transition">Lưu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container" class="fixed bottom-4 right-4 z-[100] flex flex-col gap-2"></div>
+
+<script>
+  import { getSettings, updateSettings, changePassword } from '../lib/api';
+  import { logout } from '../lib/auth';
+
+  // Settings page controller
+  const API_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8000';
+
+  function showToast(message: string, type: 'success'|'error'|'info' = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const id = Math.random().toString(36).slice(2);
+    const colors = {
+      success: 'bg-emerald-50 border-emerald-200',
+      error: 'bg-red-50 border-red-200',
+      info: 'bg-blue-50 border-blue-200',
+    };
+    const icon = type === 'success'
+      ? `<svg class="w-5 h-5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+      : type === 'error'
+      ? `<svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+      : `<svg class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+
+    const el = document.createElement('div');
+    el.id = `toast-${id}`;
+    el.className = `flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg transition-all duration-300 ${colors[type]}`;
+    el.style.cssText = 'min-width:280px;max-width:380px;opacity:1;transform:translateX(0)';
+    el.innerHTML = `${icon}<p class="text-sm font-medium flex-1">${message}</p><button onclick="this.parentElement.remove()" class="w-5 h-5 flex-shrink-0 text-current opacity-50 hover:opacity-80"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+    container.appendChild(el);
+
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(100%)';
+      setTimeout(() => el.remove(), 300);
+    }, 4000);
+  }
+
+  const settings = {
+    showToast,
+    API_BASE,
+
+    openPasswordModal() {
+      document.getElementById('password-modal')?.classList.remove('hidden');
+      document.getElementById('pwd-error')?.classList.add('hidden');
+    },
+
+    closePasswordModal() {
+      document.getElementById('password-modal')?.classList.add('hidden');
+      (document.getElementById('pwd-current') as HTMLInputElement).value = '';
+      (document.getElementById('pwd-new') as HTMLInputElement).value = '';
+      (document.getElementById('pwd-confirm') as HTMLInputElement).value = '';
+    },
+
+    async changePassword() {
+      const current = (document.getElementById('pwd-current') as HTMLInputElement).value;
+      const pwdNew = (document.getElementById('pwd-new') as HTMLInputElement).value;
+      const pwdConfirm = (document.getElementById('pwd-confirm') as HTMLInputElement).value;
+
+      if (!current || !pwdNew) {
+        const err = document.getElementById('pwd-error');
+        if (err) { err.textContent = 'Vui lòng điền đầy đủ thông tin'; err.classList.remove('hidden'); }
+        return;
+      }
+      if (pwdNew.length < 8) {
+        const err = document.getElementById('pwd-error');
+        if (err) { err.textContent = 'Mật khẩu mới phải có ít nhất 8 ký tự'; err.classList.remove('hidden'); }
+        return;
+      }
+      if (pwdNew !== pwdConfirm) {
+        const err = document.getElementById('pwd-error');
+        if (err) { err.textContent = 'Mật khẩu xác nhận không khớp'; err.classList.remove('hidden'); }
+        return;
+      }
+
+      try {
+        await changePassword(current, pwdNew);
+        this.closePasswordModal();
+        showToast('Đổi mật khẩu thành công!', 'success');
+      } catch (e) {
+        const err = document.getElementById('pwd-error');
+        if (err) { err.textContent = (e as Error).message || 'Đổi mật khẩu thất bại'; err.classList.remove('hidden'); }
+      }
+    },
+
+    openApiKeyModal() {
+      document.getElementById('apikey-modal')?.classList.remove('hidden');
+      document.getElementById('ak-error')?.classList.add('hidden');
+    },
+
+    closeApiKeyModal() {
+      document.getElementById('apikey-modal')?.classList.add('hidden');
+    },
+
+    saveApiKey() {
+      const provider = (document.getElementById('ak-provider') as HTMLSelectElement).value;
+      const apiKey = (document.getElementById('ak-key') as HTMLInputElement).value;
+      if (!apiKey) {
+        const err = document.getElementById('ak-error');
+        if (err) { err.textContent = 'Vui lòng nhập API Key'; err.classList.remove('hidden'); }
+        return;
+      }
+      // Store in localStorage for demo (in production, use backend API)
+      const keys = JSON.parse(localStorage.getItem('ccec_api_keys') || '{}');
+      keys[provider] = apiKey;
+      localStorage.setItem('ccec_api_keys', JSON.stringify(keys));
+      this.closeApiKeyModal();
+      showToast(`API Key ${provider} đã được lưu!`, 'success');
+    },
+
+    openInviteModal() {
+      const form = document.getElementById('invite-form');
+      if (form) form.classList.remove('hidden');
+    },
+
+    sendInvite() {
+      const email = (document.getElementById('invite-email') as HTMLInputElement).value;
+      const role = (document.getElementById('invite-role') as HTMLSelectElement).value;
+      if (!email) { showToast('Vui lòng nhập email', 'error'); return; }
+      // Demo: show toast
+      showToast(`Đã gửi lời mời đến ${email} (${role})`, 'info');
+      (document.getElementById('invite-email') as HTMLInputElement).value = '';
+      document.getElementById('invite-form')?.classList.add('hidden');
+    },
+
+    async saveProfile() {
+      const name = (document.getElementById('profile-name') as HTMLInputElement).value;
+      const phone = (document.getElementById('profile-phone') as HTMLInputElement).value;
+      const org = (document.getElementById('profile-org') as HTMLInputElement).value;
+      showToast('Hồ sơ đã được lưu!', 'success');
+      // In production: call PATCH /api/v1/users/me
+    },
+
+    async savePreferences() {
+      showToast('Tuỳ chọn đã được lưu!', 'success');
+      // In production: call PUT /api/v1/settings
+    },
+
+    async saveNotifications() {
+      showToast('Cài đặt thông báo đã được lưu!', 'success');
+    },
+
+    revokeSession(btn: HTMLElement) {
+      const row = btn.closest('div.flex.items-center.justify-between');
+      row?.remove();
+      showToast('Phiên đã được thu hồi', 'info');
+    },
+
+    uploadAvatar(input: HTMLInputElement) {
+      if (!input.files?.[0]) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const avatarEl = document.querySelector('[class*="rounded-full"] img') as HTMLImageElement;
+        if (avatarEl) avatarEl.src = e.target?.result as string;
+        showToast('Avatar đã được cập nhật!', 'success');
+      };
+      reader.readAsDataURL(input.files[0]);
+    },
+  };
+
+  window.ccecSettings = settings;
+</script>

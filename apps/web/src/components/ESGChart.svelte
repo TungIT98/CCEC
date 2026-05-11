@@ -156,7 +156,7 @@
   <div class="flex gap-2">
     {#each [['score', 'Điểm ESG'], ['trend', 'Xu hướng'], ['compare', 'So sánh E/S/G']] as [tab, label]}
       <button onclick={() => { activeTab = tab as any; renderChart(demoData); }}
-        class="px-4 py-1.5 text-sm rounded-full font-medium transition-colors {activeTab === tab ? 'bg-teal-600 text-white' : 'bg-[#1E293B] text-[#94A3B8] hover:text-white border border-[#334155]'}">
+        class="px-4 py-1.5 text-sm rounded-full font-medium transition-colors {activeTab === tab ? 'bg-amber-600 text-white' : 'bg-[#1E293B] text-[#94A3B8] hover:text-white border border-[#334155]'}">
         {label}
       </button>
     {/each}
@@ -167,7 +167,7 @@
 
   {#if loading}
     <div class="text-center py-6">
-      <div class="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div class="w-6 h-6 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
     </div>
   {/if}
 

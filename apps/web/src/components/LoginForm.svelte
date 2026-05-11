@@ -64,7 +64,7 @@
         bind:value={email}
         required
         placeholder="you@example.com"
-        class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition"
+        class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-amber-100 outline-none transition"
       />
     </div>
     <div>
@@ -75,14 +75,14 @@
         bind:value={password}
         required
         placeholder="••••••••"
-        class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition"
+        class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-amber-100 outline-none transition"
       />
     </div>
     <div class="flex gap-3 pt-2">
       <button
         type="submit"
         disabled={loading}
-        class="flex-1 bg-teal-600 text-white py-2.5 rounded-lg font-medium hover:bg-teal-700 disabled:opacity-50 transition"
+        class="flex-1 bg-amber-600 text-white py-2.5 rounded-lg font-medium hover:bg-amber-700 disabled:opacity-50 transition"
       >
         {loading ? 'Đang xử lý...' : 'Đăng nhập'}
       </button>

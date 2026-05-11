@@ -1,19 +1,15 @@
 app = "ccec-api"
-primary_region = "hkg"
+primary_region = "nrt"
 
 kill_signal = "SIGINT"
 kill_timeout = "5s"
 
-# Build multi-stage - compile Python deps first
-build = [
-  "pip install -r requirements.txt --system --no-deps"
-]
 
 [build]
-  dockerfile = "infra/docker/Dockerfile.api"
+  dockerfile = "../docker/Dockerfile.api"
 
 [deploy]
-  release_command = "python -m alembic upgrade head || true"
+  release_command = ""
 
 [run]
   concurrency = "25"

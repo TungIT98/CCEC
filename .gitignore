@@ -9,3 +9,11 @@ coverage
 .next
 .svelte-kit
 .temp
+
+# Python
+__pycache__
+*.py[cod]
+*.pyc
+*.pyo
+*.egg-info/
+*.egg

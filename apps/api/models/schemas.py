@@ -88,3 +88,160 @@ class HealthResponse(BaseModel):
     status: str
     version: str
     database: str = "unknown"
+
+
+# ── User Settings ─────────────────────────────────────────────────────────────
+
+class UserSettingsBase(BaseModel):
+    language: Optional[str] = "vi"
+    timezone: Optional[str] = "Asia/Ho_Chi_Minh"
+    email_notifications: Optional[bool] = True
+    push_notifications: Optional[bool] = True
+    data_alerts: Optional[bool] = True
+    marketing_emails: Optional[bool] = False
+
+
+class UserSettingsCreate(UserSettingsBase):
+    user_id: int
+
+
+class UserSettingsResponse(UserSettingsBase):
+    id: int
+    user_id: int
+    updated_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+
+# ── Notifications ─────────────────────────────────────────────────────────────
+
+class NotificationBase(BaseModel):
+    type: str  # "info" | "warning" | "alert" | "system"
+    title: str
+    message: str
+
+
+class NotificationCreate(NotificationBase):
+    pass
+
+
+class NotificationResponse(NotificationBase):
+    id: int
+    user_id: int
+    is_read: bool
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class NotificationUpdate(BaseModel):
+    is_read: Optional[bool] = None
+
+
+# ── Team ───────────────────────────────────────────────────────────────────────
+
+class TeamMemberBase(BaseModel):
+    email: EmailStr
+    role: str  # "admin" | "member" | "viewer"
+
+
+class TeamMemberCreate(TeamMemberBase):
+    pass
+
+
+class TeamMemberResponse(TeamMemberBase):
+    id: int
+    user_id: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ── Emissions ─────────────────────────────────────────────────────────────────
+
+class EmissionsRecordBase(BaseModel):
+    scope: int  # 1 | 2 | 3
+    gas_type: str  # "CO2" | "CH4" | "N2O"
+    co2e_tonnage: float
+    sector: str
+    source: Optional[str] = None
+    reporting_year: int
+
+
+class EmissionsRecordCreate(EmissionsRecordBase):
+    pass
+
+
+class EmissionsRecordResponse(EmissionsRecordBase):
+    id: int
+    user_id: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ── ESG Metrics ─────────────────────────────────────────────────────────────────
+
+class ESGMetricBase(BaseModel):
+    category: str  # "E" | "S" | "G"
+    metric_name: str
+    value: float
+    unit: Optional[str] = None
+    score: Optional[float] = None
+    reporting_period: str  # e.g. "2025-Q1"
+
+
+class ESGMetricCreate(ESGMetricBase):
+    pass
+
+
+class ESGMetricResponse(ESGMetricBase):
+    id: int
+    user_id: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ── Alerts ──────────────────────────────────────────────────────────────────────
+
+class AlertBase(BaseModel):
+    metric: str  # "temperature" | "co2" | "precipitation" | "wind_speed"
+    operator: str  # ">" | "<" | ">=" | "<="
+    threshold_value: float
+    actual_value: float
+    location_lat: Optional[float] = None
+    location_lng: Optional[float] = None
+
+
+class AlertCreate(AlertBase):
+    pass
+
+
+class AlertResponse(AlertBase):
+    id: int
+    user_id: int
+    is_resolved: bool
+    created_at: datetime
+    resolved_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+
+class AlertUpdate(BaseModel):
+    is_resolved: Optional[bool] = None
+
+
+# ── Audit Log ───────────────────────────────────────────────────────────────────
+
+class AuditLogResponse(BaseModel):
+    id: int
+    user_id: Optional[int] = None
+    action: str
+    entity_type: str
+    entity_id: Optional[int] = None
+    changes: Optional[str] = None
+    ip_address: Optional[str] = None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

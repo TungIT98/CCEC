@@ -12,12 +12,12 @@
         { name: 'Le Van C', role: 'Lead AI Engineer', bio: 'PhD in ML from Stanford, specializing in time-series forecasting.', initials: 'LVC' },
         { name: 'Pham Thi D', role: 'Product Designer', bio: 'Former Figma designer, passionate about data visualization.', initials: 'PTD' },
       ] as member}
-        <div class="bg-[#1E293B] rounded-2xl p-6 border border-[#334155] text-center hover:border-[#00E5A0]/50 transition-colors">
-          <div class="w-16 h-16 rounded-full bg-[#334155] mx-auto mb-4 flex items-center justify-center text-xl font-bold text-[#00E5A0]">
+        <div class="bg-[#1E293B] rounded-2xl p-6 border border-[#334155] text-center hover:border-[#F59E0B]/50 transition-colors">
+          <div class="w-16 h-16 rounded-full bg-[#334155] mx-auto mb-4 flex items-center justify-center text-xl font-bold text-[#F59E0B]">
             {member.initials}
           </div>
           <h3 class="text-[#F1F5F9] font-semibold mb-1">{member.name}</h3>
-          <p class="text-[#00E5A0] text-xs font-medium mb-2">{member.role}</p>
+          <p class="text-[#F59E0B] text-xs font-medium mb-2">{member.role}</p>
           <p class="text-[#94A3B8] text-xs">{member.bio}</p>
         </div>
       {/each}
