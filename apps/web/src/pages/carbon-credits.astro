@@ -1,7 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ChatWidget from '../components/chat/ChatWidget.svelte';
-import DataTable from '../components/ui/DataTable.svelte';
 ---
 
 <BaseLayout title="Carbon Credits — CCEC Climate Platform">
@@ -277,8 +275,6 @@ function authHeaders() {
   const token = getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
-const API_BASE = (import.meta as any).env?.PUBLIC_API_URL || 'http://localhost:8000';
-
 const standardColors: Record<string, string> = {
   'EU ETS': '#f59e0b',
   'California': '#3b82f6',
@@ -289,10 +285,18 @@ const standardColors: Record<string, string> = {
 };
 
 // Price chart
+const API_BASE = import.meta.env?.PUBLIC_API_URL || 'http://localhost:8000';
 const chartDom = document.getElementById('price-chart')!;
 const chart = echarts.init(chartDom);
 
 // Sample price history (12 months)
+function tooltipFormatter(params: any) {
+  let result = params[0].axisValue + '<br/>';
+  params.forEach((x: any) => {
+    result += '<span style="color:' + x.color + '">\u25CF</span> ' + x.seriesName + ': <b>$' + x.value + '</b>/tCO2<br/>';
+  });
+  return result;
+}
 const months = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'];
 const series: echarts.EChartOption.Series[] = [
   { name: 'EU ETS', type: 'line', data: [42.1, 45.3, 51.8, 58.2, 62.4, 65.1, 68.9, 67.3, 69.8, 68.4, 69.1, 68.4], smooth: true, lineStyle: { width: 2 }, symbol: 'circle', symbolSize: 4 },
@@ -308,7 +312,7 @@ const series: echarts.EChartOption.Series[] = [
 
 chart.setOption({
   backgroundColor: 'transparent',
-  tooltip: { trigger: 'axis', formatter: (p: any) => `${p[0].axisValue}<br/>` + p.map((x: any) => `<span style="color:${x.color}">●</span> ${x.seriesName}: <b>$${x.value}</b>/tCO₂`).join('<br/>`) },
+  tooltip: { trigger: 'axis', formatter: 'tooltipFormatter' },
   legend: { show: false },
   grid: { left: 50, right: 20, top: 10, bottom: 30 },
   xAxis: { type: 'category', data: months, axisLine: { lineStyle: { color: '#e2e8f0' } }, axisLabel: { color: '#94a3b8', fontSize: 11 } },
@@ -408,11 +412,10 @@ function renderSampleCredits() {
 function updatePagination(fetchedCount: number) {
   const info = document.getElementById('pagination-info')!;
   const controls = document.getElementById('pagination-controls')!;
-  info.textContent = `Page ${currentPage} · Showing ${fetchedCount} results`;
-  controls.innerHTML = `
-    <button onclick="window._ccPage=${currentPage - 1}; window._loadCredits()" class="px-3 py-1 text-xs border border-slate-200 rounded-lg hover:border-emerald-400 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>
-    <button onclick="window._ccPage=${currentPage + 1}; window._loadCredits()" class="px-3 py-1 text-xs border border-slate-200 rounded-lg hover:border-emerald-400" ${fetchedCount < pageSize ? 'disabled' : ''}>Next →</button>
-  `;
+  info.textContent = 'Page ' + currentPage + ' - Showing ' + fetchedCount + ' results';
+  controls.innerHTML =
+    '<button onclick="window._ccPage=' + (currentPage - 1) + '; window._loadCredits()" class="px-3 py-1 text-xs border border-slate-200 rounded-lg hover:border-emerald-400' + (currentPage === 1 ? ' opacity-50 cursor-not-allowed' : '') + '" ' + (currentPage === 1 ? 'disabled' : '') + '>Prev</button>' +
+    '<button onclick="window._ccPage=' + (currentPage + 1) + '; window._loadCredits()" class="px-3 py-1 text-xs border border-slate-200 rounded-lg hover:border-emerald-400" ' + (fetchedCount < pageSize ? 'disabled' : '') + '>Next</button>';
 }
 
 declare global { interface Window { _ccPage: number; _loadCredits: () => void; } }
