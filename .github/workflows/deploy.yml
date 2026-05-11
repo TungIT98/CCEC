@@ -54,7 +54,7 @@ jobs:
         run: pnpm --filter @ccec/web lint 2>/dev/null || true
 
       - name: Build web
-        run: PUBLIC_API_URL=http://ccec-api.fly.dev pnpm --filter @ccec/web build
+        run: PUBLIC_API_URL=http://ccec-api.fly.dev pnpm --filter @ccec/web build --no-build-dependency
 
   # ──────────────────────────────────────────────
   # Job 2: Build and push Docker images
