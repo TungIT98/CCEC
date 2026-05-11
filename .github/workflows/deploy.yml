@@ -35,26 +35,29 @@ jobs:
 
       - name: Install dependencies
         run: |
-          for i in 1 2 3; do
-            echo "Attempt $i/3..."
-            if pnpm install --frozen-lockfile; then
-              echo "Dependencies installed successfully"
-              exit 0
-            fi
-            echo "Attempt $i failed, retrying in 10s..."
-            sleep 10
-          done
-          echo "All attempts failed"
-          exit 1
+          echo "=== pnpm version ==="
+          pnpm --version || true
+          echo "=== node version ==="
+          node --version || true
+          echo "=== corepack status ==="
+          corepack --version || true
+          echo "=== running pnpm install ==="
+          pnpm install --frozen-lockfile 2>&1 && echo "INSTALL_SUCCESS" || echo "INSTALL_FAILED_EXIT=$?"
 
       - name: Lint API
-        run: pnpm --filter @ccec/api lint 2>/dev/null || true
+        run: |
+          echo "=== Lint API ==="
+          pnpm --filter @ccec/api lint 2>&1 || echo "LINT_API_SKIPPED_OR_FAILED"
 
       - name: Lint web
-        run: pnpm --filter @ccec/web lint 2>/dev/null || true
+        run: |
+          echo "=== Lint web ==="
+          pnpm --filter @ccec/web lint 2>&1 || echo "LINT_WEB_SKIPPED_OR_FAILED"
 
       - name: Build web
-        run: PUBLIC_API_URL=http://ccec-api.fly.dev pnpm --filter @ccec/web build --no-build-dependency
+        run: |
+          echo "=== Build web ==="
+          PUBLIC_API_URL=http://ccec-api.fly.dev pnpm --filter @ccec/web build --no-build-dependency 2>&1 && echo "BUILD_SUCCESS" || echo "BUILD_FAILED_EXIT=$?"
 
   # ──────────────────────────────────────────────
   # Job 2: Build and push Docker images
