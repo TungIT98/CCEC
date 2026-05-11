@@ -34,7 +34,18 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          for i in 1 2 3; do
+            echo "Attempt $i/3..."
+            if pnpm install --frozen-lockfile; then
+              echo "Dependencies installed successfully"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "All attempts failed"
+          exit 1
 
       - name: Lint API
         run: pnpm --filter @ccec/api lint 2>/dev/null || true
