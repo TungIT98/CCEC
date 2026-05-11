@@ -8,8 +8,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_API: ghcr.io/${{ github.repository }}/api
-  IMAGE_WEB: ghcr.io/${{ github.repository }}/web
+  # GHCR repository names MUST be lowercase — github.repository may contain
+  # uppercase (e.g. TungIT98/CCEC), so we hardcode the lowercase owner here.
+  IMAGE_API: ghcr.io/tungit98/CCEC/api
+  IMAGE_WEB: ghcr.io/tungit98/CCEC/web
 
 jobs:
   # ──────────────────────────────────────────────
