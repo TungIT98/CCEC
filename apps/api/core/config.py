@@ -25,18 +25,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # AI — OpenAI-compatible (Groq primary, DeepSeek fallback, Claude via PortKey)
-    OPENAI_API_KEY: str = ""
-    OPENAI_BASE_URL: str = "https://api.groq.com/openai/v1"
-    OPENAI_MODEL: str = "llama-3.3-70b-versatile"
-    DEEPSEEK_API_KEY: str = ""
-    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com/v1"
-    DEEPSEEK_MODEL: str = "deepseek-chat"
-    PORTKEY_API_KEY: str = ""
-    PORTKEY_BASE_URL: str = "https://api.portkey.ai/v1"
+    # AI — MiniMax OpenAI-compatible (Anthropic/MiniMax)
+    MINIMAX_API_KEY: str = ""
+    MINIMAX_BASE_URL: str = "https://api.minimax.io/v1"
+    MINIMAX_MODEL: str = "MiniMax-M2.7"
 
-    # AI fallback order
-    AI_PROVIDER: Literal["groq", "deepseek", "portkey"] = "groq"
+    AI_PROVIDER: Literal["minimax"] = "minimax"
 
     # Mapbox
     MAPBOX_ACCESS_TOKEN: str = ""
