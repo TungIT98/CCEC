@@ -1,0 +1,51 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy-web:
+    name: Deploy Web to Cloudflare Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.25.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Enable corepack
+        run: corepack enable && corepack prepare pnpm@10.25.0 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Web
+        env:
+          PUBLIC_API_URL: https://ccec-web.pages.dev/api
+        run: |
+          pnpm --filter @ccec/web build
+          # Copy Cloudflare Pages Functions into dist for deployment
+          cp -r apps/web/public/_functions "apps/web/dist/_functions"
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          wrangler pages deploy apps/web/dist \
+            --project-name=ccec-web \
+            --commit-dirty=true
