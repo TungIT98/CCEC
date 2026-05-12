@@ -1,32 +1,21 @@
 // Cloudflare Pages Function: HTTPS proxy → Fly.io API (HTTP)
-// Intercepts /api/* paths and forwards to Fly.io
+// Catches ALL /api/* requests at the edge and forwards to Fly.io
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
 
-  // Only handle /api/* paths
   if (!url.pathname.startsWith('/api/')) {
-    return new Response(JSON.stringify({ error: 'Not Found', path: url.pathname }), {
-      status: 404,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response('Not Found', { status: 404 });
   }
 
-  // Forward the full path including /api prefix to Fly.io
   const targetUrl = `http://ccec-api.fly.dev${url.pathname}${url.search}`;
   const method = context.request.method;
 
-  // Build headers object
   const headers = {};
-  try {
-    for (const [k, v] of context.request.headers.entries()) {
-      headers[k] = v;
-    }
-  } catch (e) {
-    // Ignore header iteration errors
+  for (const [k, v] of context.request.headers.entries()) {
+    headers[k] = v;
   }
 
-  // Only include body for non-GET/HEAD requests
   let fetchOptions = { method, headers };
   if (!['GET', 'HEAD'].includes(method)) {
     try {
@@ -39,7 +28,6 @@ export async function onRequest(context) {
   try {
     const response = await fetch(targetUrl, fetchOptions);
     const text = await response.text();
-
     return new Response(text, {
       status: response.status,
       headers: {
