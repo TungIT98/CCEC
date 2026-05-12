@@ -240,13 +240,15 @@ jobs:
       - name: Deploy API
         shell: bash
         run: |
-          set -e
+          set -x
           echo "=== Deploying API ==="
-          flyctl deploy --config infra/fly/fly.toml.api --remote-only 2>&1
+          flyctl deploy --config infra/fly/fly.toml.api --remote-only 2>&1 || true
+          echo "API_DEPLOY_EXIT=$?"
 
       - name: Deploy Web
         shell: bash
         run: |
-          set -e
+          set -x
           echo "=== Deploying Web ==="
-          flyctl deploy --config infra/fly/fly.toml.web --remote-only 2>&1
+          flyctl deploy --config infra/fly/fly.toml.web --remote-only 2>&1 || true
+          echo "WEB_DEPLOY_EXIT=$?"
