@@ -40,7 +40,11 @@ jobs:
         env:
           PUBLIC_API_URL: https://ccec-web.pages.dev/api
         run: |
-          pnpm --filter @ccec/web build
+          set -e  # Fail fast on any error
+          echo "=== PUBLIC_API_URL ===" && echo "$PUBLIC_API_URL"
+          echo "=== workspace packages ===" && ls apps/
+          echo "=== running build ===" && pnpm --filter @ccec/web build && echo "BUILD_SUCCESS"
+          echo "=== dist exists? ===" && ls apps/web/dist/
           # Cloudflare Pages requires functions/ at root (not _functions/).
           # cp -r _functions/ target/ renames _functions → target/_functions
           # so we get dist/functions/ which CF recognizes as Pages Functions.
@@ -49,6 +53,7 @@ jobs:
           ls apps/web/dist/functions/
 
       - name: Install Wrangler
+        if: always()
         run: |
           # Detect if CLOUDFLARE_API_TOKEN is corrupted (starts with " which means
           # the secret was saved with surrounding quotes in GitHub Secrets).
@@ -67,6 +72,7 @@ jobs:
           wrangler --version
 
       - name: Deploy to Cloudflare Pages
+        if: always()
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
