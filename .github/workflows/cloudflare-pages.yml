@@ -34,8 +34,8 @@ jobs:
           echo "=== node version ===" && node --version
           echo "=== corepack ===" && corepack --version
           echo "=== git status lockfile ===" && git status pnpm-lock.yaml
-          echo "=== running install (no frozen-lockfile to allow npm registry fetch) ===" && pnpm install 2>&1 && echo "INSTALL_SUCCESS" || echo "INSTALL_FAILED_EXIT=$?"
-          echo "=== force re-fetch vite ===" && rm -rf node_modules/.pnpm/vite* && pnpm install 2>&1 | tail -5
+          echo "=== running install ===" && pnpm install 2>&1 && echo "INSTALL_SUCCESS" || echo "INSTALL_FAILED_EXIT=$?"
+          echo "=== vite check ===" && ls node_modules/vite/package.json 2>/dev/null && node -e "import('vite').then(m=>console.log('vite OK:',m.version)).catch(e=>console.error('vite FAIL:',e.message))" || echo "vite not found"
           echo "=== node_modules check ===" && ls node_modules/.pnpm 2>/dev/null | wc -l || echo "no .pnpm"
           echo "=== vite check ===" && ls node_modules/vite/package.json 2>/dev/null && node -e "import('vite').then(m=>console.log('vite OK:',m.version)).catch(e=>console.error('vite FAIL:',e.message))" || echo "vite not in root node_modules"
 
@@ -43,12 +43,8 @@ jobs:
         env:
           PUBLIC_API_URL: https://ccec-web.pages.dev
         run: |
-          echo "=== PUBLIC_API_URL ===" && echo "$PUBLIC_API_URL"
-          echo "=== workspace packages ===" && ls apps/
-          echo "=== checking vite ===" && ls apps/web/node_modules/vite/package.json 2>/dev/null && node -e "import('vite').then(m=>console.log('vite OK:', m.version)).catch(e=>console.error('vite FAIL:',e.message))"
           echo "=== running build ==="
-          pnpm --filter @ccec/web build --no-build-dependency; echo "BUILD_EXIT=$?"
-          echo "=== dist/ ===" && ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"
+          PUBLIC_API_URL=https://ccec-web.pages.dev pnpm --filter @ccec/web build --no-build-dependency 2>&1 && echo "BUILD_SUCCESS" || echo "BUILD_FAILED_EXIT=$?"
 
       - name: Copy Functions for CF Pages Deployment
         if: always()
