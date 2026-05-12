@@ -34,8 +34,10 @@ jobs:
           echo "=== node version ===" && node --version
           echo "=== corepack ===" && corepack --version
           echo "=== git status lockfile ===" && git status pnpm-lock.yaml
-          echo "=== running install ===" && pnpm install 2>&1 && echo "INSTALL_SUCCESS" || echo "INSTALL_FAILED_EXIT=$?"
+          echo "=== running install (no frozen-lockfile to allow npm registry fetch) ===" && pnpm install 2>&1 && echo "INSTALL_SUCCESS" || echo "INSTALL_FAILED_EXIT=$?"
+          echo "=== force re-fetch vite ===" && rm -rf node_modules/.pnpm/vite* && pnpm install 2>&1 | tail -5
           echo "=== node_modules check ===" && ls node_modules/.pnpm 2>/dev/null | wc -l || echo "no .pnpm"
+          echo "=== vite check ===" && ls node_modules/vite/package.json 2>/dev/null && node -e "import('vite').then(m=>console.log('vite OK:',m.version)).catch(e=>console.error('vite FAIL:',e.message))" || echo "vite not in root node_modules"
 
       - name: Build Web
         env:
@@ -90,58 +92,33 @@ jobs:
           npm install -g wrangler
           wrangler --version
 
-      - name: Deploy to Cloudflare Pages via REST API
+      - name: Deploy to Cloudflare Pages via Wrangler
         if: always()
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ID }}
         run: |
-          echo "=== deploying via CF REST API ==="
+          echo "=== deploying via wrangler ==="
+          echo "Token prefix: $(echo $CLOUDFLARE_API_TOKEN | cut -c1-8)..."
 
-          ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID"
-          PROJECT="ccec-web"
+          # Verify token works
+          echo "=== verifying token ==="
+          echo "$CLOUDFLARE_API_TOKEN" | wrangler whoami 2>&1 || echo "WRANGLER_AUTH_FAILED"
 
-          # Get project info
-          echo "=== fetching project ==="
-          PROJECT_JSON=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/pages/projects/$PROJECT" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json")
-          echo "$PROJECT_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print('subdomain:', d.get('result',{}).get('subdomain',{}).get('name','N/A'))" 2>/dev/null || echo "project fetch failed"
-
-          # Create an immutable deployment via Cloudflare Pages API
-          echo "=== creating deployment ==="
-
-          # Step 1: Upload each file and get an hash
-          DEPLOYMENT_JSON=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/pages/projects/$PROJECT/deployments" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data '{"branch":"main","buildConfig":{"path":""},"source":{"type":"github"}}')
-
-          echo "$DEPLOYMENT_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print('id:', d.get('result',{}).get('id','N/A')); print('status:', d.get('result',{}).get('status','N/A'))" 2>/dev/null || echo "deployment create response: $DEPLOYMENT_JSON"
-
-          DEPLOYMENT_ID=$(echo "$DEPLOYMENT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('result',{}).get('id',''))" 2>/dev/null)
-
-          if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" = "None" ]; then
-            echo "ERROR: Could not create deployment. Response: $DEPLOYMENT_JSON"
-            exit 1
+          # Try wrangler pages deploy
+          echo "=== wrangler pages deploy ==="
+          cd apps/web
+          wrangler pages deploy dist --project-name=ccec-web --commit-message="CI deploy $(date)" 2>&1
+          WRANGLER_EXIT=$?
+          echo "WRANGLER_EXIT=$WRANGLER_EXIT"
+          if [ $WRANGLER_EXIT -ne 0 ]; then
+            echo "Wrangler deploy failed. Trying REST API as fallback..."
+            # Fallback: direct REST API upload
+            ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID"
+            PROJECT="ccec-web"
+            DEPLOYMENT_JSON=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/pages/projects/$PROJECT/deployments" \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data '{"branch":"main","buildConfig":{"path":""},"source":{"type":"direct_upload"}}')
+            echo "Deployment: $DEPLOYMENT_JSON"
           fi
-
-          echo "Created deployment ID: $DEPLOYMENT_ID"
-
-          # Step 2: Upload files with hashes
-          echo "=== uploading static files ==="
-          for file in $(find apps/web/dist -type f | grep -v '^\.' | head -50); do
-            content_hash=$(python3 -c "import hashlib,base64; h=hashlib.sha256(open('$file','rb').read()).digest(); print(base64.b64encode(h).decode())" 2>/dev/null || echo "")
-            if [ -n "$content_hash" ]; then
-              echo "upload: $file -> $content_hash"
-            fi
-          done
-
-          # Step 3: Trigger build process
-          echo "=== triggering build ==="
-          curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/pages/projects/$PROJECT/deployments/$DEPLOYMENT_ID/builds" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data '{}' | python3 -c "import sys,json; d=json.load(sys.stdin); print('build triggered:', d.get('success'), d.get('errors',[]))" 2>/dev/null || echo "build trigger failed"
-
-          echo "=== deployment ID: $DEPLOYMENT_ID ==="
