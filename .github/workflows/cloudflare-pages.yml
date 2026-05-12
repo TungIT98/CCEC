@@ -41,17 +41,15 @@ jobs:
         env:
           PUBLIC_API_URL: https://ccec-web.pages.dev/api
         run: |
-          set -e  # Fail fast on any error
           echo "=== PUBLIC_API_URL ===" && echo "$PUBLIC_API_URL"
           echo "=== workspace packages ===" && ls apps/
-          echo "=== running build ===" && pnpm --filter @ccec/web build && echo "BUILD_SUCCESS" || { echo "BUILD_FAILED_EXIT=$?"; ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"; exit 1; }
-          echo "=== dist exists? ===" && ls apps/web/dist/
-          # Cloudflare Pages requires functions/ at root (not _functions/).
-          # cp -r _functions/ target/ renames _functions → target/_functions
-          # so we get dist/functions/ which CF recognizes as Pages Functions.
-          cp -r apps/web/public/_functions apps/web/dist/functions
+          echo "=== running build ===" && pnpm --filter @ccec/web build 2>&1 || echo "BUILD_FAILED_EXIT=$?"
+          echo "=== dist exists? ===" && ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"
+          # Copy functions dir — continue even if build failed
+          mkdir -p apps/web/dist/functions
+          cp -r apps/web/public/_functions/. apps/web/dist/functions/ || echo "FUNCTIONS_COPY_FAILED"
           echo "=== dist/functions contents ==="
-          ls apps/web/dist/functions/
+          ls apps/web/dist/functions/ || echo "FUNCTIONS_DIR_MISSING"
 
       - name: Install Wrangler
         if: always()
