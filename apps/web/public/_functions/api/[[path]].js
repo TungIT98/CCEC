@@ -1,15 +1,21 @@
 // Cloudflare Pages Function: HTTPS proxy → Fly.io API (HTTP)
 // Intercepts /api/* paths and forwards to Fly.io, stripping the /api prefix
+// NOTE: If this file is not being called, Cloudflare Pages is serving
+// index.html for these paths instead. The dist/functions/ directory must
+// be deployed (not dist/_functions/).
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
 
+  // Only handle /api/* paths — return 404 for other routes
+  // so Cloudflare serves static files (Astro index.html fallback)
+  if (!url.pathname.startsWith('/api/')) {
+    return new Response('Not Found', { status: 404 });
+  }
+
   // Strip the /api prefix — Fly.io API uses /api/v1/* internally
   // /api/v1/health → /v1/health
-  const apiPrefix = '/api';
-  const pathWithoutApi = url.pathname.startsWith(apiPrefix)
-    ? url.pathname.slice(apiPrefix.length)
-    : url.pathname;
+  const pathWithoutApi = url.pathname.slice(4); // remove '/api'
   const targetUrl = `http://ccec-api.fly.dev${pathWithoutApi}${url.search}`;
   const method = context.request.method;
 
