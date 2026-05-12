@@ -35,8 +35,12 @@ jobs:
           PUBLIC_API_URL: https://ccec-web.pages.dev/api
         run: |
           pnpm --filter @ccec/web build
-          # Copy Cloudflare Pages Functions into dist for deployment
-          cp -r apps/web/public/_functions "apps/web/dist/_functions"
+          # Cloudflare Pages requires functions/ at root (not _functions/).
+          # cp -r _functions/ target/ renames _functions → target/_functions
+          # so we get dist/functions/ which CF recognizes as Pages Functions.
+          cp -r apps/web/public/_functions apps/web/dist/functions
+          echo "=== dist/functions contents ==="
+          ls apps/web/dist/functions/
 
       - name: Install Wrangler
         run: npm install -g wrangler

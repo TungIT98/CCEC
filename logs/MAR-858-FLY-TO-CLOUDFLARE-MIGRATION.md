@@ -22,6 +22,11 @@ Root cause: Singapore (sin) region in Fly.io has broken ACME. Machine was remove
 
 Cloudflare Pages Functions run at the edge, provide HTTPS automatically, and can forward requests to Fly.io HTTP backend.
 
+**IMPORTANT — Directory name:** Cloudflare Pages expects `functions/` (no underscore).
+In the local repo we use `apps/web/public/functions/` to avoid Astro treating it as a private dir.
+The `cloudflare-pages.yml` copies `apps/web/public/_functions/` → `apps/web/dist/functions/` (renamed).
+Note: the deployed site uses `/functions/` (not `/_functions/`).
+
 ```
 Browser (HTTPS) → Cloudflare Pages → [[path]].js → Fly.io API (HTTP)
 ```
