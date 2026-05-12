@@ -28,7 +28,12 @@ jobs:
         run: corepack enable && corepack prepare pnpm@10.25.0 --activate
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          echo "=== pnpm version ===" && pnpm --version
+          echo "=== node version ===" && node --version
+          echo "=== corepack ===" && corepack --version
+          echo "=== running install ===" && pnpm install --frozen-lockfile 2>&1 && echo "INSTALL_SUCCESS" || echo "INSTALL_FAILED_EXIT=$?"
+          echo "=== node_modules check ===" && ls node_modules/.pnpm 2>/dev/null | wc -l || echo "no .pnpm"
 
       - name: Build Web
         env:
