@@ -1,44 +1,20 @@
-// Cloudflare Pages Function: HTTPS proxy → Fly.io API (HTTP)
-// Catches ALL /api/* requests at the edge and forwards to Fly.io
-
-export async function onRequest(context) {
-  const url = new URL(context.request.url);
-
+export async function onRequest({ request }) {
+  const url = new URL(request.url);
   if (!url.pathname.startsWith('/api/')) {
     return new Response('Not Found', { status: 404 });
   }
-
-  const targetUrl = `http://ccec-api.fly.dev${url.pathname}${url.search}`;
-  const method = context.request.method;
-
-  const headers = {};
-  for (const [k, v] of context.request.headers.entries()) {
-    headers[k] = v;
+  const target = `http://ccec-api.fly.dev${url.pathname}${url.search}`;
+  let opts = { method: request.method, headers: {} };
+  for (const [k, v] of request.headers.entries()) opts.headers[k] = v;
+  if (!['GET', 'HEAD'].includes(request.method)) {
+    try { opts.body = await request.text(); } catch {}
   }
-
-  let fetchOptions = { method, headers };
-  if (!['GET', 'HEAD'].includes(method)) {
-    try {
-      fetchOptions.body = await context.request.text();
-    } catch (e) {
-      fetchOptions.body = null;
-    }
-  }
-
-  try {
-    const response = await fetch(targetUrl, fetchOptions);
-    const text = await response.text();
-    return new Response(text, {
-      status: response.status,
-      headers: {
-        'Content-Type': response.headers.get('content-type') || 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: 'Proxy failed', message: err.message }), {
-      status: 502,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  const res = await fetch(target, opts);
+  return new Response(await res.text(), {
+    status: res.status,
+    headers: {
+      'Content-Type': res.headers.get('content-type') || 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
+  });
 }

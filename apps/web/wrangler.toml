@@ -1,0 +1,4 @@
+name = "ccec-web"
+compatibility_date = "2024-01-01"
+account_id = "2b9327c415b0332ede6508d2f5a89691"
+pages_build_output_dir = "dist"

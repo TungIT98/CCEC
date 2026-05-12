@@ -102,5 +102,6 @@ jobs:
           echo "=== deploying to CF Pages ==="
           wrangler pages deploy apps/web/dist \
             --project-name=ccec-web \
+            --config=apps/web/wrangler.toml \
             --commit-dirty=true
           echo "=== deploy exit: $? ==="
