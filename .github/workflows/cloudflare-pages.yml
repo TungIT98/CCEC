@@ -39,7 +39,11 @@ jobs:
 
       - name: Build Web
         env:
-          PUBLIC_API_URL: https://ccec-web.pages.dev/api
+          # IMPORTANT: no trailing /api — the proxy is at the root.
+          # Frontend code appends /api/v1/* to API_BASE, so:
+          # https://ccec-web.pages.dev + /api/v1/health = https://ccec-web.pages.dev/api/v1/health
+          # CF Pages Function catches /api/* and forwards to Fly.io (which has /api/v1 prefix).
+          PUBLIC_API_URL: https://ccec-web.pages.dev
         run: |
           echo "=== PUBLIC_API_URL ===" && echo "$PUBLIC_API_URL"
           echo "=== workspace packages ===" && ls apps/
@@ -51,18 +55,22 @@ jobs:
         if: always()
         run: |
           echo "=== copying functions to dist ==="
-          # Create functions/ directory (CF Pages reads from this, not _functions/)
+          # Create functions/ at root (CF Pages reads from this dir for edge functions)
           mkdir -p apps/web/dist/functions
-          # Remove stale _functions directory (CF Pages reads functions/ without underscore)
+          # Remove stale _functions dir — Astro puts our source at dist/_functions/,
+          # but we need the compiled function at dist/functions/ for CF to pick it up
           rm -rf apps/web/dist/_functions
-          # Remove _redirects SPA catch-all — CF Pages processes _redirects BEFORE Functions,
-          # so /* → /index.html would intercept /api/* before [[path]].js runs.
+          # Remove _redirects SPA catch-all — CF Pages processes _redirects BEFORE
+          # Functions, so /* → /index.html intercepts /api/* before [[path]].js runs
           rm -f apps/web/dist/_redirects
-          # Copy [[path]].js from the built dist/_functions/ dir to dist/functions/
           # Astro copies public/_functions/ → dist/_functions/ during build.
+          # Copy [[path]].js to dist/functions/ at the ROOT level (not nested).
+          # CF Pages [[path]].js at the functions/ root catches ALL dynamic routes.
           cp "apps/web/dist/_functions/api/[[path]].js" apps/web/dist/functions/
           echo "=== dist/functions/ contents ==="
           ls -la apps/web/dist/functions/
+          echo "=== dist/_functions/ removed? ==="
+          ls apps/web/dist/ | grep function || echo "(removed)"
 
       - name: Install Wrangler
         if: always()
@@ -91,7 +99,6 @@ jobs:
         run: |
           echo "=== dist/functions/ files ==="
           ls -la apps/web/dist/functions/
-          ls -la apps/web/dist/functions/api/
           echo "=== deploying to CF Pages ==="
           wrangler pages deploy apps/web/dist \
             --project-name=ccec-web \
