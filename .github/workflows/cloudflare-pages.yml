@@ -48,7 +48,7 @@ jobs:
           echo "=== PUBLIC_API_URL ===" && echo "$PUBLIC_API_URL"
           echo "=== workspace packages ===" && ls apps/
           echo "=== running build ==="
-          pnpm --filter @ccec/web build; echo "BUILD_EXIT=$?"
+          pnpm --filter @ccec/web build --no-build-dependency; echo "BUILD_EXIT=$?"
           echo "=== dist/ ===" && ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"
 
       - name: Copy Functions for CF Pages Deployment
