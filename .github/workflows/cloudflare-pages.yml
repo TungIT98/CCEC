@@ -32,7 +32,8 @@ jobs:
           echo "=== pnpm version ===" && pnpm --version
           echo "=== node version ===" && node --version
           echo "=== corepack ===" && corepack --version
-          echo "=== running install ===" && pnpm install --frozen-lockfile 2>&1 && echo "INSTALL_SUCCESS" || echo "INSTALL_FAILED_EXIT=$?"
+          echo "=== git status lockfile ===" && git status pnpm-lock.yaml
+          echo "=== running install ===" && pnpm install 2>&1 && echo "INSTALL_SUCCESS" || echo "INSTALL_FAILED_EXIT=$?"
           echo "=== node_modules check ===" && ls node_modules/.pnpm 2>/dev/null | wc -l || echo "no .pnpm"
 
       - name: Build Web
@@ -48,7 +49,22 @@ jobs:
           ls apps/web/dist/functions/
 
       - name: Install Wrangler
-        run: npm install -g wrangler
+        run: |
+          # Detect if CLOUDFLARE_API_TOKEN is corrupted (starts with " which means
+          # the secret was saved with surrounding quotes in GitHub Secrets).
+          # This will cause wrangler to fail with "Authentication error [code: 10000]".
+          TOKEN_VAL="${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          if echo "$TOKEN_VAL" | grep -q '^"'; then
+            echo "ERROR: CLOUDFLARE_API_TOKEN secret is corrupted (starts with quote char)."
+            echo "This means the secret was saved WITH surrounding quotes in GitHub Settings."
+            echo "Fix: Go to GitHub → Settings → Secrets → CLOUDFLARE_API_TOKEN and re-enter"
+            echo "     the token value WITHOUT any quotes or surrounding characters."
+            echo "Current token starts with: $(echo "$TOKEN_VAL" | cut -c1-15)..."
+            exit 1
+          fi
+          echo "Token prefix OK: $(echo "$TOKEN_VAL" | cut -c1-8)..."
+          npm install -g wrangler
+          wrangler --version
 
       - name: Deploy to Cloudflare Pages
         env:
