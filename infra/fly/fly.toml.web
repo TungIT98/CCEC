@@ -17,7 +17,7 @@ kill_timeout = "5s"
 
 [[services]]
   internal_port = 4321
-  protocol = "tcp"
+  protocol = "http"
 
   [services.concurrency]
     hard_limit = 100
