@@ -51,12 +51,14 @@ jobs:
         if: always()
         run: |
           echo "=== copying functions to dist ==="
-          # Ensure dist/ exists (may not if build failed)
+          # Create functions/ directory structure
           mkdir -p apps/web/dist
-          # Create functions/ at dist root (CF Pages recognizes this as Functions dir)
           mkdir -p apps/web/dist/functions
+          # Remove any existing stale _functions copy and use fresh copy
+          rm -rf apps/web/dist/_functions
           # Copy [[path]].js to functions/ root (catches all dynamic paths)
           cp "apps/web/public/_functions/api/[[path]].js" apps/web/dist/functions/
+          echo "=== dist/ ===" && ls apps/web/dist/
           echo "=== dist/functions/ ===" && ls apps/web/dist/functions/
 
       - name: Install Wrangler
