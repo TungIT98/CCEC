@@ -52,22 +52,16 @@ jobs:
           echo "=== copying functions to dist ==="
           # Create functions/ at root (CF Pages reads from this dir for edge functions)
           mkdir -p apps/web/dist/functions
-          # Remove stale _functions dir — Astro puts our source at dist/_functions/,
-          # but we need the compiled function at dist/functions/ for CF to pick it up
-          rm -rf apps/web/dist/_functions
           # Remove _redirects SPA catch-all — CF Pages processes _redirects BEFORE
           # Functions, so /* → /index.html intercepts /api/* before [[path]].js runs
           rm -f apps/web/dist/_redirects
-          # Astro copies public/_functions/ → dist/_functions/ during build.
-          # Copy [[path]].js and _routes.json to dist/functions/ at the ROOT level.
-          # CF Pages [[path]].js at functions/ root catches all dynamic routes.
-          # _routes.json tells CF which routes the function handles (api/*).
-          cp "apps/web/dist/_functions/api/[[path]].js" apps/web/dist/functions/
-          cp "apps/web/dist/_functions/_routes.json" apps/web/dist/functions/
+          # Copy [[path]].js and _routes.json from public/ to dist/functions/
+          # (Astro does NOT copy public/_functions/ to dist/_functions/ because
+          # underscore prefix makes it a hidden file in Node fs.copyFileSync)
+          cp "apps/web/public/_functions/api/[[path]].js" apps/web/dist/functions/
+          cp "apps/web/public/_functions/_routes.json" apps/web/dist/functions/
           echo "=== dist/functions/ contents ==="
           ls -la apps/web/dist/functions/
-          echo "=== dist/_functions/ removed? ==="
-          ls apps/web/dist/ | grep function || echo "(removed)"
 
       - name: Install Wrangler
         if: always()
