@@ -39,14 +39,11 @@ jobs:
 
       - name: Build Web
         env:
-          # IMPORTANT: no trailing /api — the proxy is at the root.
-          # Frontend code appends /api/v1/* to API_BASE, so:
-          # https://ccec-web.pages.dev + /api/v1/health = https://ccec-web.pages.dev/api/v1/health
-          # CF Pages Function catches /api/* and forwards to Fly.io (which has /api/v1 prefix).
           PUBLIC_API_URL: https://ccec-web.pages.dev
         run: |
           echo "=== PUBLIC_API_URL ===" && echo "$PUBLIC_API_URL"
           echo "=== workspace packages ===" && ls apps/
+          echo "=== checking vite ===" && ls apps/web/node_modules/vite/package.json 2>/dev/null && node -e "import('vite').then(m=>console.log('vite OK:', m.version)).catch(e=>console.error('vite FAIL:',e.message))"
           echo "=== running build ==="
           pnpm --filter @ccec/web build --no-build-dependency; echo "BUILD_EXIT=$?"
           echo "=== dist/ ===" && ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"
