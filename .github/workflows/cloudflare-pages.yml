@@ -44,18 +44,18 @@ jobs:
           echo "=== PUBLIC_API_URL ===" && echo "$PUBLIC_API_URL"
           echo "=== workspace packages ===" && ls apps/
           echo "=== running build ==="
-          # Use env to avoid any set -e exit
-          pnpm --filter @ccec/web build; exit_code=$?
-          echo "BUILD_EXIT_CODE=$exit_code"
-          if [ $exit_code -ne 0 ]; then echo "BUILD_FAILED"; fi
-          echo "=== dist exists? ===" && ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"
-          # Copy _routes.json to ROOT of dist (not inside functions/)
-          cp apps/web/public/_functions/_routes.json apps/web/dist/_routes.json
-          # Copy functions dir — continue even if build failed
+          pnpm --filter @ccec/web build; echo "BUILD_EXIT=$?"
+          echo "=== dist/ ===" && ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"
+
+      - name: Copy Functions for CF Pages Deployment
+        if: always()
+        run: |
+          echo "=== copying functions to dist ==="
           mkdir -p apps/web/dist/functions
           cp -r apps/web/public/_functions/api apps/web/dist/functions/
-          echo "=== dist/functions contents ==="
-          ls apps/web/dist/functions/ || echo "FUNCTIONS_DIR_MISSING"
+          cp apps/web/public/_functions/_routes.json apps/web/dist/
+          echo "=== dist/functions/ ===" && ls apps/web/dist/functions/
+          echo "=== dist/functions/api/ ===" && ls apps/web/dist/functions/api/
           echo "=== dist/_routes.json ===" && cat apps/web/dist/_routes.json
 
       - name: Install Wrangler
