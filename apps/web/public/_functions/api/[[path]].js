@@ -13,10 +13,9 @@ export async function onRequest(context) {
     return new Response('Not Found', { status: 404 });
   }
 
-  // Strip the /api prefix — Fly.io API uses /api/v1/* internally
-  // /api/v1/health → /v1/health
-  const pathWithoutApi = url.pathname.slice(4); // remove '/api'
-  const targetUrl = `http://ccec-api.fly.dev${pathWithoutApi}${url.search}`;
+  // Forward the full path including /api prefix to Fly.io
+  // Fly.io FastAPI uses /api/v1/* routes internally
+  const targetUrl = `http://ccec-api.fly.dev${url.pathname}${url.search}`;
   const method = context.request.method;
 
   // Filter Cloudflare-specific and hop-by-hop headers
