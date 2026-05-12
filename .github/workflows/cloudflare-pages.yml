@@ -45,11 +45,14 @@ jobs:
           echo "=== workspace packages ===" && ls apps/
           echo "=== running build ===" && pnpm --filter @ccec/web build 2>&1 || echo "BUILD_FAILED_EXIT=$?"
           echo "=== dist exists? ===" && ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"
+          # Copy _routes.json to ROOT of dist (not inside functions/)
+          cp apps/web/public/_functions/_routes.json apps/web/dist/_routes.json
           # Copy functions dir — continue even if build failed
           mkdir -p apps/web/dist/functions
-          cp -r apps/web/public/_functions/. apps/web/dist/functions/ || echo "FUNCTIONS_COPY_FAILED"
+          cp -r apps/web/public/_functions/api apps/web/dist/functions/
           echo "=== dist/functions contents ==="
           ls apps/web/dist/functions/ || echo "FUNCTIONS_DIR_MISSING"
+          echo "=== dist/_routes.json ===" && cat apps/web/dist/_routes.json
 
       - name: Install Wrangler
         if: always()
