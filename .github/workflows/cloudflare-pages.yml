@@ -44,7 +44,7 @@ jobs:
           set -e  # Fail fast on any error
           echo "=== PUBLIC_API_URL ===" && echo "$PUBLIC_API_URL"
           echo "=== workspace packages ===" && ls apps/
-          echo "=== running build ===" && pnpm --filter @ccec/web build && echo "BUILD_SUCCESS"
+          echo "=== running build ===" && pnpm --filter @ccec/web build && echo "BUILD_SUCCESS" || { echo "BUILD_FAILED_EXIT=$?"; ls apps/web/dist/ 2>/dev/null || echo "NO_DIST"; exit 1; }
           echo "=== dist exists? ===" && ls apps/web/dist/
           # Cloudflare Pages requires functions/ at root (not _functions/).
           # cp -r _functions/ target/ renames _functions → target/_functions
