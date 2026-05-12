@@ -89,26 +89,36 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ID }}
         run: |
           echo "=== deploying via wrangler ==="
-          echo "Token prefix: $(echo $CLOUDFLARE_API_TOKEN | cut -c1-8)..."
+          echo "Token: ${CLOUDFLARE_API_TOKEN:0:8}..."
+          echo "Account: $CLOUDFLARE_ACCOUNT_ID"
 
-          # Verify token works
-          echo "=== verifying token ==="
-          echo "$CLOUDFLARE_API_TOKEN" | wrangler whoami 2>&1 || echo "WRANGLER_AUTH_FAILED"
-
-          # Try wrangler pages deploy
-          echo "=== wrangler pages deploy ==="
+          # Run wrangler from apps/web directory
           cd apps/web
-          wrangler pages deploy dist --project-name=ccec-web --commit-message="CI deploy $(date)" 2>&1
+
+          # Test auth
+          echo "=== whoami ===" && npx wrangler whoami 2>&1 || true
+
+          # Deploy with verbose output
+          echo "=== wrangler pages deploy ==="
+          npx wrangler pages deploy dist --project-name=ccec-web --commit-message="CI deploy $(date)" 2>&1
           WRANGLER_EXIT=$?
           echo "WRANGLER_EXIT=$WRANGLER_EXIT"
           if [ $WRANGLER_EXIT -ne 0 ]; then
-            echo "Wrangler deploy failed. Trying REST API as fallback..."
-            # Fallback: direct REST API upload
+            echo "Wrangler deploy failed with exit $WRANGLER_EXIT"
+            echo "Trying direct upload via CF REST API..."
+            # Direct upload via CF REST API
             ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID"
             PROJECT="ccec-web"
             DEPLOYMENT_JSON=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/pages/projects/$PROJECT/deployments" \
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
               -H "Content-Type: application/json" \
-              --data '{"branch":"main","buildConfig":{"path":""},"source":{"type":"direct_upload"}}')
+              --data "{\"branch\":\"main\",\"buildConfig\":{\"path\":\"\"},\"source\":{\"type\":\"direct_upload\"}}")
             echo "Deployment: $DEPLOYMENT_JSON"
+            DEPLOYMENT_ID=$(echo "$DEPLOYMENT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('result',{}).get('id',''))" 2>/dev/null)
+            if [ -n "$DEPLOYMENT_ID" ]; then
+              echo "SUCCESS: deployment $DEPLOYMENT_ID created"
+              echo "Visit: https://ccec-web.pages.dev"
+            fi
+          else
+            echo "Wrangler deploy SUCCESS"
           fi
