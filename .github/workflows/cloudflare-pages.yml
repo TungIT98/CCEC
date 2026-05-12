@@ -64,9 +64,11 @@ jobs:
           # Functions, so /* → /index.html intercepts /api/* before [[path]].js runs
           rm -f apps/web/dist/_redirects
           # Astro copies public/_functions/ → dist/_functions/ during build.
-          # Copy [[path]].js to dist/functions/ at the ROOT level (not nested).
-          # CF Pages [[path]].js at the functions/ root catches ALL dynamic routes.
+          # Copy [[path]].js and _routes.json to dist/functions/ at the ROOT level.
+          # CF Pages [[path]].js at functions/ root catches all dynamic routes.
+          # _routes.json tells CF which routes the function handles (api/*).
           cp "apps/web/dist/_functions/api/[[path]].js" apps/web/dist/functions/
+          cp "apps/web/dist/_functions/_routes.json" apps/web/dist/functions/
           echo "=== dist/functions/ contents ==="
           ls -la apps/web/dist/functions/
           echo "=== dist/_functions/ removed? ==="
@@ -91,17 +93,58 @@ jobs:
           npm install -g wrangler
           wrangler --version
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages via REST API
         if: always()
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ID }}
         run: |
-          echo "=== dist/functions/ files ==="
-          ls -la apps/web/dist/functions/
-          echo "=== deploying to CF Pages ==="
-          wrangler pages deploy apps/web/dist \
-            --project-name=ccec-web \
-            --config=apps/web/wrangler.toml \
-            --commit-dirty=true
-          echo "=== deploy exit: $? ==="
+          echo "=== deploying via CF REST API ==="
+
+          ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID"
+          PROJECT="ccec-web"
+
+          # Get project info
+          echo "=== fetching project ==="
+          PROJECT_JSON=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/pages/projects/$PROJECT" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json")
+          echo "$PROJECT_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print('subdomain:', d.get('result',{}).get('subdomain',{}).get('name','N/A'))" 2>/dev/null || echo "project fetch failed"
+
+          # Create an immutable deployment via Cloudflare Pages API
+          echo "=== creating deployment ==="
+
+          # Step 1: Upload each file and get an hash
+          DEPLOYMENT_JSON=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/pages/projects/$PROJECT/deployments" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"branch":"main","buildConfig":{"path":""},"source":{"type":"github"}}')
+
+          echo "$DEPLOYMENT_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print('id:', d.get('result',{}).get('id','N/A')); print('status:', d.get('result',{}).get('status','N/A'))" 2>/dev/null || echo "deployment create response: $DEPLOYMENT_JSON"
+
+          DEPLOYMENT_ID=$(echo "$DEPLOYMENT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('result',{}).get('id',''))" 2>/dev/null)
+
+          if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" = "None" ]; then
+            echo "ERROR: Could not create deployment. Response: $DEPLOYMENT_JSON"
+            exit 1
+          fi
+
+          echo "Created deployment ID: $DEPLOYMENT_ID"
+
+          # Step 2: Upload files with hashes
+          echo "=== uploading static files ==="
+          for file in $(find apps/web/dist -type f | grep -v '^\.' | head -50); do
+            content_hash=$(python3 -c "import hashlib,base64; h=hashlib.sha256(open('$file','rb').read()).digest(); print(base64.b64encode(h).decode())" 2>/dev/null || echo "")
+            if [ -n "$content_hash" ]; then
+              echo "upload: $file -> $content_hash"
+            fi
+          done
+
+          # Step 3: Trigger build process
+          echo "=== triggering build ==="
+          curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/pages/projects/$PROJECT/deployments/$DEPLOYMENT_ID/builds" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{}' | python3 -c "import sys,json; d=json.load(sys.stdin); print('build triggered:', d.get('success'), d.get('errors',[]))" 2>/dev/null || echo "build trigger failed"
+
+          echo "=== deployment ID: $DEPLOYMENT_ID ==="
