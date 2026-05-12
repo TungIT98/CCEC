@@ -91,17 +91,14 @@ jobs:
           echo "=== CF deploy ==="
           echo "Token: ${CLOUDFLARE_API_TOKEN:0:8}..."
           echo "Account: $CLOUDFLARE_ACCOUNT_ID"
+
           cd apps/web
-
-          echo "=== whoami ===" && npx wrangler whoami 2>&1 || true
-
-          echo "=== wrangler pages deploy ==="
           npx wrangler pages deploy dist --project-name=ccec-web 2>&1
           WRANGLER_EXIT=$?
           echo "WRANGLER_EXIT=$WRANGLER_EXIT"
 
           if [ $WRANGLER_EXIT -ne 0 ]; then
-            echo "Wrangler deploy failed. Trying REST API..."
+            echo "Wrangler deploy failed. Trying REST API direct upload..."
             RESP=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/ccec-web/deployments" \
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
               -H "Content-Type: application/json" \
@@ -109,10 +106,10 @@ jobs:
             echo "REST Response: $RESP"
             DEPLOY_ID=$(echo "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('result',{}).get('id','') or 'FAILED')" 2>/dev/null)
             if [ "$DEPLOY_ID" != "FAILED" ] && [ -n "$DEPLOY_ID" ]; then
-              echo "REST deploy SUCCESS: $DEPLOY_ID"
-              echo "Deployment URL: https://ccec-web.pages.dev"
+              echo "SUCCESS: deployment $DEPLOY_ID created"
+              echo "URL: https://ccec-web.pages.dev"
             else
-              echo "REST deploy also FAILED"
+              echo "Both wrangler and REST API failed. Check token has 'Cloudflare Pages: Edit' permission."
               exit 1
             fi
           else
