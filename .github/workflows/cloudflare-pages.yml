@@ -53,15 +53,12 @@ jobs:
           echo "=== copying functions to dist ==="
           # Create functions/ at dist root (CF Pages recognizes this as Functions dir)
           mkdir -p apps/web/dist/functions/api
-          # Copy [[path]].js — use find to handle special chars safely
-          cp "apps/web/public/_functions/api/[[path]].js" apps/web/dist/functions/api/
-          # Copy _routes.json inside functions/ (controls which paths trigger the function)
+          # Copy [[path]].js to functions/ directly (root-level catch-all)
+          cp "apps/web/public/_functions/api/[[path]].js" apps/web/dist/functions/
+          # Copy _routes.json (remove include filter — handle filtering in JS instead)
           cp apps/web/public/_functions/_routes.json apps/web/dist/functions/
-          # Diagnostic copy to dist root
-          cp apps/web/public/_functions/_routes.json apps/web/dist/
           echo "=== dist/functions/ ===" && ls apps/web/dist/functions/
           echo "=== dist/functions/api/ ===" && ls apps/web/dist/functions/api/
-          echo "=== dist/functions/_routes.json ===" && cat apps/web/dist/functions/_routes.json
 
       - name: Install Wrangler
         if: always()
